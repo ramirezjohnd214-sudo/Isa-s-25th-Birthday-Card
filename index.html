@@ -186,6 +186,76 @@
   display:flex;
   flex-direction:column;
 }
+.hud.compact {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 5;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: .8rem;
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .4rem;
+  width: fit-content;
+}
+
+.hud.compact h1 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0 0 .2rem 0;
+  color: #fff;
+}
+
+.hud.compact button {
+  font-size: 0.8rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+}
+.hud.compact {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  background: rgba(15, 20, 40, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  color: #fff;
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.6);
+  transition: opacity 0.3s ease;
+}
+
+.hud.compact h1 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+}
+.hud.compact button {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.hud.compact button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
 </style>
 </head>
 <body>
