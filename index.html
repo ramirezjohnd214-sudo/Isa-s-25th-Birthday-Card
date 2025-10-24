@@ -76,11 +76,24 @@
 
 /* Keep your hover behavior */
 .mstar:hover{ transform: scale(1.5); }
-  .tooltip{
-    position:absolute; transform:translate(-50%,-160%);
-    padding:.25rem .5rem; background:#000a; border:1px solid #ffffff30; border-radius:.5rem;
-    font-size:.8rem; white-space:nowrap; pointer-events:none; backdrop-filter:blur(4px)
-  }
+  .tooltip {
+  position: absolute;
+  transform: translate(-50%, -160%);
+  padding: 0.3rem 0.6rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  font-family: "Quicksand", sans-serif;
+  font-size: 0.8rem;
+  color: #fff;
+  pointer-events: none;
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, -150%) scale(0.9); }
+  to { opacity: 1; transform: translate(-50%, -160%) scale(1); }
+}
   /* UI BAR */
   /* Smaller, floating HUD in the top-right */
 .hud {
@@ -264,6 +277,46 @@
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
   animation: fadeIn 0.3s ease;
 }
+/* --- Fun message modal styling --- */
+.message-modal {
+  border: none;
+  border-radius: 16px;
+  padding: 1.8rem;
+  max-width: 420px;
+  background: rgba(15, 20, 40, 0.85);
+  color: #fff;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.3), 0 0 60px rgba(0, 150, 255, 0.1);
+  font-family: "Indie Flower", cursive;
+  text-align: center;
+  animation: popIn 0.4s ease-out;
+  transform-origin: center;
+}
+
+.message-modal h2 {
+  font-size: 1.8rem;
+  color: #ffda79;
+  margin-bottom: 0.6rem;
+  text-shadow: 0 0 10px rgba(255, 255, 200, 0.8);
+}
+
+.message-modal p {
+  font-size: 1.2rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* Soft "pop-in" animation */
+@keyframes popIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.9); }
@@ -328,6 +381,7 @@ box-shadow: 0 0 25px 8px rgba(255,255,255,0.95),
   animation: shootingStar 1.4s linear forwards;
   pointer-events: none;
 }
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&family=Indie+Flower&display=swap" rel="stylesheet">
 </style>
 </head>
 <body>
