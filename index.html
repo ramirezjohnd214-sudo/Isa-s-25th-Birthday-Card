@@ -654,20 +654,15 @@ onSnapshot(q, snap=>{
     document.getElementById('closeView').onclick = ()=>viewModal.close();
 
     function openView(id, data){
-      currentDocId = id;
-      viewContent.innerHTML = `
-        <h3>${escapeHtml(data.name)}</h3>
-        <p style="white-space:pre-wrap">${escapeHtml(data.message)}</p>
-        <p class="muted">Click star to see on the sky. Posted ${data.createdAt?.toDate ? data.createdAt.toDate().toLocaleString() : 'just now'}.</p>
-      `;
-      // Admin controls
-      document.getElementById('editBtn').style.display = admin ? 'inline-block' : 'none';
-      document.getElementById('deleteBtn').style.display = admin ? 'inline-block' : 'none';
-      viewModal.showModal();
-
-      // center tooltip? just scroll not needed, stars fixed
-    }
-
+  currentDocId = id;
+  viewContent.innerHTML = `
+    <h3>${escapeHtml(data.name)}</h3>
+    <p style="white-space:pre-wrap">${escapeHtml(data.message)}</p>
+  `;
+  document.getElementById('editBtn').style.display = admin ? 'inline-block' : 'none';
+  document.getElementById('deleteBtn').style.display = admin ? 'inline-block' : 'none';
+  viewModal.showModal();
+}
     document.getElementById('deleteBtn').onclick = async () => {
   if (!admin || !currentDocId) return;
   if (!confirm('Delete this star?')) return;
