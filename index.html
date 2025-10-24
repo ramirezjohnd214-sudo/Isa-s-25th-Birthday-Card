@@ -434,33 +434,37 @@ box-shadow: 0 0 25px 8px rgba(255,255,255,0.95),
 }
 .firework {
   position: absolute;
-  width: 4px;
-  height: 4px;
-  background: white;
+  width: 5px;
+  height: 5px;
+  background: radial-gradient(circle, #fff 0%, #ffd700 60%, transparent 100%);
   border-radius: 50%;
-  animation: shoot 1s ease-out forwards;
   pointer-events: none;
-  z-index: 0;
+  animation: shootUp 1.2s ease-out forwards;
+  z-index: 1;
+  box-shadow: 0 0 15px 5px rgba(255,255,255,0.8);
 }
 
-@keyframes shoot {
-  0% { transform: translateY(0) scale(1); opacity: 1; }
-  70% { opacity: 1; }
-  100% { transform: translateY(-400px) scale(0.8); opacity: 0; }
+@keyframes shootUp {
+  0% { transform: translateY(0); opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(-450px); opacity: 0; }
 }
 
 .explosion {
   position: absolute;
-  width: 2px;
-  height: 2px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   pointer-events: none;
-  animation: explode 1.5s ease-out forwards;
+  animation: explode 1.8s ease-out forwards;
+  mix-blend-mode: screen;
+  filter: blur(1px);
 }
 
 @keyframes explode {
-  0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(1.2) translate(var(--x), var(--y)); opacity: 0; }
+  0% { transform: scale(0.5); opacity: 1; }
+  70% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1.4) translate(var(--x), var(--y)); opacity: 0; }
 }
 </style>
 </head>
@@ -920,6 +924,9 @@ setInterval(() => {
 
 // Start one right away
 spawnShootingStar();
+// --- Shooting star code ends above ---
+
+// 🎇 Disney-style Fireworks code starts here
 function createFirework() {
   const fw = document.createElement("div");
   fw.className = "firework";
@@ -927,33 +934,41 @@ function createFirework() {
   fw.style.bottom = "0px";
   document.body.appendChild(fw);
 
-  // when shoot ends, create explosion
   fw.addEventListener("animationend", () => {
     fw.remove();
-    createExplosion(parseInt(fw.style.left), window.innerHeight - 400);
+    const baseY = window.innerHeight * (0.4 + Math.random() * 0.2);
+    createExplosion(parseInt(fw.style.left), baseY);
   });
 }
 
 function createExplosion(x, y) {
-  const colors = ["#ffd700", "#ff69b4", "#87cefa", "#ffffff", "#ffa500"];
-  for (let i = 0; i < 25; i++) {
+  const colors = [
+    "#ffd700", "#ff69b4", "#00ffff", "#87cefa", "#ffffff",
+    "#ffa500", "#ff4500", "#adff2f", "#00bfff", "#ffb6c1"
+  ];
+  const burstSize = 25 + Math.floor(Math.random() * 30);
+  const spread = 200 + Math.random() * 200;
+
+  for (let i = 0; i < burstSize; i++) {
     const spark = document.createElement("div");
     spark.className = "explosion";
-    spark.style.left = x + "px";
-    spark.style.top = y + "px";
+    spark.style.left = `${x}px`;
+    spark.style.top = `${y}px`;
     spark.style.background = colors[Math.floor(Math.random() * colors.length)];
-    spark.style.setProperty("--x", `${(Math.random() - 0.5) * 300}px`);
-    spark.style.setProperty("--y", `${(Math.random() - 0.5) * 300}px`);
+    spark.style.setProperty("--x", `${(Math.random() - 0.5) * spread}px`);
+    spark.style.setProperty("--y", `${(Math.random() - 0.5) * spread}px`);
+    spark.style.width = `${2 + Math.random() * 4}px`;
+    spark.style.height = spark.style.width;
+    spark.style.boxShadow = `0 0 ${8 + Math.random() * 12}px ${spark.style.background}`;
     document.body.appendChild(spark);
-    setTimeout(() => spark.remove(), 1500);
+    setTimeout(() => spark.remove(), 1800);
   }
 }
 
-// Launch fireworks randomly every 20–30 seconds
+// 🎇 Launch a firework every 5 seconds
 setInterval(() => {
-  const chance = Math.random();
-  if (chance < 0.8) createFirework();
-}, 25000);
-  </script>
+  createFirework();
+}, 5000);
+</script>
 </body>
 </html>
