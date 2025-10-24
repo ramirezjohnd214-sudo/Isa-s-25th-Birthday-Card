@@ -432,6 +432,36 @@ box-shadow: 0 0 25px 8px rgba(255,255,255,0.95),
   animation: shootingStar 1.4s linear forwards;
   pointer-events: none;
 }
+.firework {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  animation: shoot 1s ease-out forwards;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes shoot {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translateY(-400px) scale(0.8); opacity: 0; }
+}
+
+.explosion {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: explode 1.5s ease-out forwards;
+}
+
+@keyframes explode {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.2) translate(var(--x), var(--y)); opacity: 0; }
+}
 </style>
 </head>
 <body>
@@ -891,5 +921,39 @@ setInterval(() => {
 // Start one right away
 spawnShootingStar();
   </script>
+  function createFirework() {
+  const fw = document.createElement("div");
+  fw.className = "firework";
+  fw.style.left = Math.random() * window.innerWidth + "px";
+  fw.style.bottom = "0px";
+  document.body.appendChild(fw);
+
+  // when shoot ends, create explosion
+  fw.addEventListener("animationend", () => {
+    fw.remove();
+    createExplosion(parseInt(fw.style.left), window.innerHeight - 400);
+  });
+}
+
+function createExplosion(x, y) {
+  const colors = ["#ffd700", "#ff69b4", "#87cefa", "#ffffff", "#ffa500"];
+  for (let i = 0; i < 25; i++) {
+    const spark = document.createElement("div");
+    spark.className = "explosion";
+    spark.style.left = x + "px";
+    spark.style.top = y + "px";
+    spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+    spark.style.setProperty("--x", `${(Math.random() - 0.5) * 300}px`);
+    spark.style.setProperty("--y", `${(Math.random() - 0.5) * 300}px`);
+    document.body.appendChild(spark);
+    setTimeout(() => spark.remove(), 1500);
+  }
+}
+
+// Launch fireworks randomly every 20–30 seconds
+setInterval(() => {
+  const chance = Math.random();
+  if (chance < 0.8) createFirework();
+}, 25000);
 </body>
 </html>
