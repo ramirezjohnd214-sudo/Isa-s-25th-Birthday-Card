@@ -287,14 +287,6 @@
   <button id="logoutBtn" class="ghost" style="display:none">Sign out</button>
 </div>
 
-  <div class="hud-buttons">
-    <button id="addBtn" class="accent">Add Your Star ✨</button>
-    <button id="loginBtn" class="ghost">Admin</button>
-    <button id="logoutBtn" class="ghost" style="display:none">Sign out</button>
-  </div>
-</div>
-
-
   <div class="cta">
     <span class="muted">Tip: click the sky to place your star</span>
   </div>
@@ -321,9 +313,13 @@
 
   <!-- View/Edit Modal -->
   <dialog id="viewModal" class="message-modal">
-  <h2 id="viewName"></h2>
-  <p id="viewMessage"></p>
-  <button id="deleteBtn" class="danger" style="display:none">Delete</button>
+  <div id="viewContent"></div>
+  <div class="row" style="margin-top:.75rem">
+    <button id="closeView" class="ghost">Close</button>
+    <div class="spacer"></div>
+    <button id="editBtn" class="ghost" style="display:none">Edit</button>
+    <button id="deleteBtn" class="danger" style="display:none">Delete</button>
+  </div>
 </dialog>
 
   <!-- Edit Modal -->
@@ -472,22 +468,33 @@ function sparkleAt(x, y) {
   sparkle.className = 'sparkle';
   sparkle.style.left = `${x}px`;
   sparkle.style.top = `${y}px`;
+  sparkle.style.position = 'fixed';
   document.body.appendChild(sparkle);
   setTimeout(() => sparkle.remove(), 900);
 }
     // Add star to Firestore
     document.getElementById('addForm').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      if(!pendingPos){ addModal.close(); return;}
-      const name = document.getElementById('nameInput').value.trim();
-      const message = document.getElementById('msgInput').value.trim();
-      await addDoc(collection(db, 'messages'), {
-        name, message, x: pendingPos.x, y: pendingPos.y, createdAt: serverTimestamp()
-      });
-sparkleAt(x, y);
+  e.preventDefault();
+  if(!pendingPos){ addModal.close(); return;}
 
-      addModal.close(); toast('Your star is live ⭐');
-    });
+  const name = document.getElementById('nameInput').value.trim();
+  const message = document.getElementById('msgInput').value.trim();
+
+  await addDoc(collection(db, 'messages'), {
+    name,
+    message,
+    x: pendingPos.x,
+    y: pendingPos.y,
+    createdAt: serverTimestamp()
+  });
+
+  // sparkle where the star goes
+  const px = fromPct(pendingPos.x, pendingPos.y);
+  sparkleAt(px.x, px.y);
+
+  addModal.close();
+  toast('Your star is live ⭐');
+});
 
     // Render a message star
     function renderStar(id, data){
@@ -516,19 +523,23 @@ el.dataset.id=id;
 
     // Live subscription
     const q = query(collection(db,'messages'), orderBy('createdAt','asc'));
-    onSnapshot(q, snap=>{
-      countBadge.textContent = `${snap.size} messages`;
-      const liveIds = new Set();
-      snap.forEach(docu=>{
-        const id = docu.id, data = docu.data();
-        liveIds.add(id);
-        renderStar(id, data);
-      });
-      // cleanup removed
-      document.querySelectorAll('.mstar').forEach(el=>{
-        if(!liveIds.has(el.dataset.id)) el.remove();
-      });
-    });
+onSnapshot(q, snap=>{
+  if (countBadge) {
+    countBadge.textContent = `${snap.size} messages`;
+  }
+
+  const liveIds = new Set();
+  snap.forEach(docu=>{
+    const id = docu.id;
+    const data = docu.data();
+    liveIds.add(id);
+    renderStar(id, data);
+  });
+
+  document.querySelectorAll('.mstar').forEach(el=>{
+    if(!liveIds.has(el.dataset.id)) el.remove();
+  });
+});
 
     /* ----- View / Edit / Delete ----- */
     const viewContent = document.getElementById('viewContent');
@@ -611,34 +622,24 @@ el.dataset.id=id;
     });
 
     /* ----- Export / Import (admin) ----- */
-    exportBtn.onclick = async ()=>{
-      const snap = await (await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"))
-        import { onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+    // ----- Export all stars (Admin only) -----
+exportBtn.onclick = async () => {
+  try {
+    const { getDocs } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+    const snap = await getDocs(collection(db, "messages"));
+    const data = [];
+    snap.forEach(docu => data.push({ id: docu.id, ...docu.data() }));
 
-onSnapshot(collection(db, "messages"), snapshot => {
-  snapshot.docChanges().forEach(change => {
-    const id = change.doc.id;
-    const data = change.doc.data();
-
-    if (change.type === "added") {
-      renderStar(id, data);
-    } else if (change.type === "removed") {
-      // 🔥 Remove the deleted star from the card
-      const el = document.getElementById(id);
-      if (el) {
-        el.style.transition = "opacity 0.4s ease";
-        el.style.opacity = 0;
-        setTimeout(() => el.remove(), 400);
-      }
-    }
-  });
-});
-
-      const data = [];
-      snap.forEach(d=>data.push({id:d.id, ...d.data()}));
-      const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-      const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='isa-stars.json'; a.click();
-    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "isa-stars.json";
+    a.click();
+    toast("Export complete!");
+  } catch (err) {
+    alert("Export failed: " + err.message);
+  }
+};
     importFile.onchange = async (e)=>{
       const file = e.target.files?.[0]; if(!file) return;
       const text = await file.text();
