@@ -304,7 +304,34 @@
   line-height: 1.5;
   white-space: pre-wrap;
 }
+/* --- Sparkle pop-in animation for message modal --- */
+@keyframes sparklePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) rotate(-2deg);
+    box-shadow: 0 0 0px rgba(255,255,255,0);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.05) rotate(1deg);
+    box-shadow:
+      0 0 20px rgba(255,255,255,0.7),
+      0 0 40px rgba(255,215,0,0.4),
+      0 0 60px rgba(125,211,252,0.3);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+    box-shadow:
+      0 0 12px rgba(255,255,255,0.4),
+      0 0 25px rgba(125,211,252,0.2);
+  }
+}
 
+.message-modal {
+  animation: sparklePop 0.8s ease-out;
+  transition: transform 0.3s ease, box-shadow 0.5s ease;
+}
 /* Soft "pop-in" animation */
 @keyframes popIn {
   from {
@@ -663,6 +690,26 @@ onSnapshot(q, snap=>{
   document.getElementById('deleteBtn').style.display = admin ? 'inline-block' : 'none';
   viewModal.showModal();
 }
+function sparkleBurst(x, y, count = 12) {
+  for (let i = 0; i < count; i++) {
+    const s = document.createElement("div");
+    s.className = "sparkle";
+    s.style.left = `${x + (Math.random() * 100 - 50)}px`;
+    s.style.top = `${y + (Math.random() * 60 - 30)}px`;
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 900);
+  }
+}
+// ✨ trigger a sparkle when a message modal opens
+const oldOpenView = openView;
+openView = function(id, data) {
+  oldOpenView(id, data);
+  const rect = viewModal.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  sparkleBurst(cx, cy);
+};
+
     document.getElementById('deleteBtn').onclick = async () => {
   if (!admin || !currentDocId) return;
   if (!confirm('Delete this star?')) return;
