@@ -633,24 +633,46 @@ function sparkleAt(x, y) {
 
     // Render a message star
     function renderStar(id, data){
-      // create element if missing
-      let el = document.querySelector(`.mstar[data-id="${id}"]`);
-      if(!el){
-        el = document.createElement('div'); el.className='mstar';
+  // create element if missing
+  let el = document.querySelector(`.mstar[data-id="${id}"]`);
+  if(!el){
+    el = document.createElement('div');
+    el.className='mstar';
+    el.dataset.id = id;
+
     // give each star a unique twinkle speed and start time
     el.style.setProperty('--dur', `${(2 + Math.random()*2).toFixed(2)}s`);
     el.style.animationDelay = `${(Math.random()*2).toFixed(2)}s`;
-el.dataset.id=id;
-        const tip = document.createElement('div'); tip.className='tooltip'; tip.textContent=data.name; el.appendChild(tip);
-        el.addEventListener('mouseenter', ()=> tip.style.display='block');
-        el.addEventListener('mouseleave', ()=> tip.style.display='none');
-        el.addEventListener('click', ()=>openView(id, data));
-        layer.appendChild(el);
-      }
-      const {x,y} = fromPct(data.x, data.y);
-      el.style.left = `${x}px`; el.style.top = `${y}px`;
-    }
 
+    const tip = document.createElement('div');
+    tip.className='tooltip';
+    tip.textContent = data.name;
+    el.appendChild(tip);
+
+    // hover tooltip
+    el.addEventListener('mouseenter', ()=> {
+      tip.style.display='block';
+    });
+
+    el.addEventListener('mouseleave', ()=> {
+      tip.style.display='none';
+    });
+
+    // click to open message (with guard)
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();          // don't let click bubble
+      if (viewModal.open) return;   // if already open, don't open again
+      openView(id, data);
+    });
+
+    layer.appendChild(el);
+  }
+
+  // move existing star to correct spot
+  const pos = fromPct(data.x, data.y);
+  el.style.left = `${pos.x}px`;
+  el.style.top  = `${pos.y}px`;
+}
     function removeStar(id){
       const el = document.querySelector(`.mstar[data-id="${id}"]`);
       if(el) el.remove();
