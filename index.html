@@ -602,69 +602,66 @@ box-shadow: 0 0 25px 8px rgba(255,255,255,0.95),
 
   /* ===== Fireworks: Disney-Style ===== */
   function createFirework() {
-    const fw = document.createElement("div");
-    fw.className = "firework";
+  const fw = document.createElement("div");
+  fw.className = "firework";
 
-    const depth = Math.random();
-    let scale, opacity, heightMult;
+  // Depth layers for realism
+  const depth = Math.random();
+  let scale, opacity, heightMult;
 
-    if (depth < 0.3) { scale = 0.4; opacity = 0.6; heightMult = 0.7; }
-    else if (depth < 0.7) { scale = 0.7; opacity = 0.8; heightMult = 0.85; }
-    else { scale = 1.0; opacity = 1.0; heightMult = 1.0; }
+  if (depth < 0.3) { scale = 0.4; opacity = 0.6; heightMult = 0.7; }
+  else if (depth < 0.7) { scale = 0.7; opacity = 0.8; heightMult = 0.85; }
+  else { scale = 1.0; opacity = 1.0; heightMult = 1.0; }
 
-    const startX = Math.random() * window.innerWidth;
-    const startY = window.innerHeight * 0.5; // halfway point of image
+  // 🟡 Start slightly above grass line (~60% of screen height)
+  const startX = Math.random() * window.innerWidth;
+  const startY = window.innerHeight * 0.6;
 
-    fw.style.left = `${startX}px`;
-    fw.style.bottom = `${startY}px`;
-    fw.style.transform = `scale(${scale})`;
-    fw.style.opacity = opacity;
+  fw.style.left = `${startX}px`;
+  fw.style.bottom = `${startY}px`; // start higher, above grass
+  fw.style.transform = `scale(${scale})`;
+  fw.style.opacity = opacity;
 
-    document.body.appendChild(fw);
+  document.body.appendChild(fw);
 
-    fw.addEventListener("animationend", () => {
-      fw.remove();
-      const peakY = window.innerHeight * (0.8 + Math.random() * 0.1 * heightMult);
-      createExplosion(startX, peakY, scale);
-    });
+  fw.addEventListener("animationend", () => {
+    fw.remove();
+    // 🎆 Explode near top 25% of sky
+    const peakY = window.innerHeight * (0.85 + Math.random() * 0.1 * heightMult);
+    createExplosion(startX, peakY, scale);
+  });
+}
+
+function createExplosion(x, y, scale = 1) {
+  const colors = [
+    "#ffd700", "#ff69b4", "#00ffff", "#ffffff",
+    "#ffa500", "#adff2f", "#87cefa", "#ffb6c1"
+  ];
+
+  const sparks = 35 + Math.floor(Math.random() * 20);
+  const spread = 130 * scale + Math.random() * 130 * scale;
+  const duration = 1600 + Math.random() * 700;
+
+  for (let i = 0; i < sparks; i++) {
+    const s = document.createElement("div");
+    s.className = "explosion";
+    s.style.left = `${x}px`;
+    s.style.top = `${y * 0.75}px`; // make sure explosion is visually higher
+    s.style.background = colors[Math.floor(Math.random() * colors.length)];
+    s.style.width = `${2 + Math.random() * 3 * scale}px`;
+    s.style.height = s.style.width;
+    s.style.boxShadow = `0 0 ${8 + 8 * scale}px ${s.style.background}`;
+    s.style.setProperty("--x", `${(Math.random() - 0.5) * spread}px`);
+    s.style.setProperty("--y", `${(Math.random() - 0.5) * spread}px`);
+    s.style.opacity = 0.8 + 0.2 * scale;
+    s.style.animationDuration = `${duration}ms`;
+    s.style.animationName = "explode, shimmer";
+    s.style.animationTimingFunction = "ease-out, linear";
+    s.style.animationIterationCount = "1, infinite";
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), duration);
   }
-
-  function createExplosion(x, y, scale = 1) {
-    const colors = [
-      "#ffd700", "#ff69b4", "#00ffff", "#ffffff",
-      "#ffa500", "#adff2f", "#87cefa", "#ffb6c1"
-    ];
-
-    const sparks = 35 + Math.floor(Math.random() * 20);
-    const spread = 130 * scale + Math.random() * 130 * scale;
-    const duration = 1600 + Math.random() * 700;
-
-    for (let i = 0; i < sparks; i++) {
-      const s = document.createElement("div");
-      s.className = "explosion";
-      s.style.left = `${x}px`;
-      s.style.top = `${y}px`;
-      s.style.background = colors[Math.floor(Math.random() * colors.length)];
-      s.style.width = `${2 + Math.random() * 3 * scale}px`;
-      s.style.height = s.style.width;
-      s.style.boxShadow = `0 0 ${8 + 8 * scale}px ${s.style.background}`;
-      s.style.setProperty("--x", `${(Math.random() - 0.5) * spread}px`);
-      s.style.setProperty("--y", `${(Math.random() - 0.5) * spread}px`);
-      s.style.opacity = 0.8 + 0.2 * scale;
-      s.style.animationDuration = `${duration}ms`;
-      s.style.animationName = "explode, shimmer";
-      s.style.animationTimingFunction = "ease-out, linear";
-      s.style.animationIterationCount = "1, infinite";
-      document.body.appendChild(s);
-      setTimeout(() => s.remove(), duration);
-    }
-  }
-
-  // 🎇 Fireworks every 5 seconds (sometimes double bursts)
-  setInterval(() => {
-    createFirework();
-    if (Math.random() < 0.5) setTimeout(createFirework, 1000 + Math.random() * 1500);
-  }, 5000);
+}
 </script>
 </body>
 </html>
