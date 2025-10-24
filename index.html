@@ -710,27 +710,46 @@ exportBtn.onclick = async () => {
 
     function escapeHtml(str){ return str.replace(/[&<>"']/g,s=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[s])) }
   // --- Shooting star effect every 30 seconds ---
-// --- Shooting star effect every 30 seconds ---
+// --- Randomized Shooting Star Effect ---
 function spawnShootingStar() {
   const star = document.createElement('div');
   star.className = 'shooting-star';
 
-  // random starting position (far right)
-  const startX = innerWidth + 200;
-  const startY = Math.random() * (innerHeight * 0.4); // top 40% of screen
+  // Randomly decide direction (true = left→right, false = right→left)
+  const leftToRight = Math.random() > 0.5;
+
+  const startX = leftToRight ? -200 : innerWidth + 200;
+  const startY = Math.random() * (innerHeight * 0.5); // top half of screen
+  const endX = leftToRight ? innerWidth + 400 : -400;
+  const endY = startY + (Math.random() * 400 - 200); // small angle variation
+
+  const dx = endX - startX;
+  const dy = endY - startY;
+
   star.style.left = `${startX}px`;
   star.style.top = `${startY}px`;
+  star.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
 
   document.body.appendChild(star);
 
-  // remove after animation
+  // Animate movement using CSS transition
+  star.animate(
+    [
+      { transform: `translate(0, 0) scale(1)`, opacity: 1 },
+      { transform: `translate(${dx}px, ${dy}px) scale(0.8)`, opacity: 0 }
+    ],
+    { duration: 1500, easing: 'linear' }
+  );
+
   setTimeout(() => star.remove(), 1500);
 }
 
-// spawn every 30 seconds
-setInterval(spawnShootingStar, 30000);
+// Spawn every 30 seconds (randomize slightly so it's not robotic)
+setInterval(() => {
+  if (Math.random() < 0.9) spawnShootingStar(); // 90% chance each cycle
+}, 30000);
 
-// start immediately on load
+// Start one right away
 spawnShootingStar();
   </script>
 </body>
