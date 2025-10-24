@@ -696,7 +696,6 @@ onSnapshot(q, snap=>{
   const cy = rect.top + rect.height / 2;
   sparkleBurst(cx, cy);
 }
-
 function sparkleBurst(x, y, count = 12) {
   for (let i = 0; i < count; i++) {
     const s = document.createElement("div");
@@ -707,15 +706,6 @@ function sparkleBurst(x, y, count = 12) {
     setTimeout(() => s.remove(), 900);
   }
 }
-// ✨ trigger a sparkle when a message modal opens
-const oldOpenView = openView;
-openView = function(id, data) {
-  oldOpenView(id, data);
-  const rect = viewModal.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2;
-  const cy = rect.top + rect.height / 2;
-  sparkleBurst(cx, cy);
-};
 
     document.getElementById('deleteBtn').onclick = async () => {
   if (!admin || !currentDocId) return;
