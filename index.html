@@ -392,15 +392,19 @@ el.dataset.id=id;
       // center tooltip? just scroll not needed, stars fixed
     }
 
-    document.getElementById('deleteBtn').onclick = async ()=>{
-      if(!admin || !currentDocId) return;
-      if(confirm('Delete this star?')){
-        await deleteDoc(doc(db,'messages', currentDocId));
-        viewModal.close();
-        toast('Star deleted');
-      }
-    };
+    document.getElementById('deleteBtn').onclick = async () => {
+  if (!admin || !currentDocId) return;
+  if (!confirm('Delete this star?')) return;
 
+  try {
+    await deleteDoc(doc(db, 'messages', currentDocId));
+    viewModal.close();
+    toast('Star deleted');
+  } catch (err) {
+    alert('Delete failed:\n' + (err?.message || err));
+    console.error('Delete error:', err);
+  }
+};
     const editForm = document.getElementById('editForm');
     document.getElementById('editBtn').onclick = ()=>{
       const starEl = document.querySelector(`.mstar[data-id="${currentDocId}"]`);
