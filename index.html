@@ -920,8 +920,7 @@ setInterval(() => {
 
 // Start one right away
 spawnShootingStar();
-  </script>
-  function createFirework() {
+function createFirework() {
   const fw = document.createElement("div");
   fw.className = "firework";
   fw.style.left = Math.random() * window.innerWidth + "px";
@@ -955,5 +954,6 @@ setInterval(() => {
   const chance = Math.random();
   if (chance < 0.8) createFirework();
 }, 25000);
+  </script>
 </body>
 </html>
