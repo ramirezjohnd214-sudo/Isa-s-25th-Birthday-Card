@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Happy 25th Birthday, Isa!!</title>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<style>
+  :root{
+    --skyTop:#08182a;        /* deep indigo */
+    --skyBottom:#0c2743;     /* lighter indigo */
+    --glow:#ffffffd0;
+    --accent:#7dd3fc;
+    --grass:#0e1b22;
+    --ui:#0b1220cc;
+    --gold:#ffd166;
+    --danger:#ff6b6b;
+  }
+  html,body{height:100%;margin:0;background:linear-gradient(to bottom,var(--skyTop),var(--skyBottom));color:#e6f1ff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;overflow:hidden}
+  /* BACKGROUND ART */
+  .bg{
+    position:fixed; inset:0;
+    background: center bottom/cover no-repeat url("BACKGROUND_IMAGE_FILE"); /* ← put your final image file name here */
+    filter: saturate(1) contrast(1.05);
+    pointer-events:none;
+  }
+  /* CANVAS STARS */
+  #star-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+  /* INTERACTIVE STAR LAYER (DOM) */
+  #message-layer{position:fixed;inset:0;z-index:2;pointer-events:none;}
+  .mstar{
+    position:absolute; width:8px; height:8px; border-radius:50%;
+    box-shadow:0 0 10px 2px var(--glow), 0 0 2px 1px #fff;
+    background:#fff; cursor:pointer; pointer-events:auto; transition:transform .12s;
+  }
+  .mstar:hover{transform:scale(1.5)}
+  .tooltip{
+    position:absolute; transform:translate(-50%,-160%);
+    padding:.25rem .5rem; background:#000a; border:1px solid #ffffff30; border-radius:.5rem;
+    font-size:.8rem; white-space:nowrap; pointer-events:none; backdrop-filter:blur(4px)
+  }
+  /* UI BAR */
+  .hud{
+    position:fixed; left:1rem; right:1rem; top:1rem; z-index:3; display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;
+    background:var(--ui); border:1px solid #ffffff24; padding:.6rem .8rem; border-radius:12px; backdrop-filter:blur(6px)
+  }
+  .hud h1{font-size:1rem;margin:0;font-weight:600; letter-spacing:.3px}
+  .hud .spacer{flex:1}
+  button, .btn{
+    background:#111933; color:#e6f1ff; border:1px solid #ffffff28; border-radius:10px; padding:.5rem .75rem; font-weight:600; cursor:pointer;
+  }
+  button:hover{filter:brightness(1.2)}
+  .ghost{background:transparent}
+  .accent{border-color:#7dd3fc50}
+  .danger{border-color:#ff6b6b70;color:#ffb3b3}
+  /* FOOTER CTA */
+  .cta{
+    position:fixed; left:50%; bottom:1rem; transform:translateX(-50%);
+    z-index:3; display:flex; gap:.5rem; align-items:center; background:var(--ui);
+    border:1px solid #ffffff24; padding:.6rem .8rem; border-radius:12px; backdrop-filter:blur(6px)
+  }
+  /* MODALS */
+  dialog{border:none; border-radius:16px; background:#0b1220f2; color:#e6f1ff; padding:1.25rem; width:min(520px,92vw)}
+  dialog::backdrop{background:rgba(0,0,0,.5)}
+  .field{display:grid; gap:.35rem; margin:.6rem 0}
+  input[type="text"], input[type="email"], input[type="password"], textarea{
+    width:100%; background:#0f1830; color:#e6f1ff; border:1px solid #ffffff24; border-radius:10px; padding:.55rem .7rem;
+  }
+  textarea{min-height:100px; resize:vertical}
+  .row{display:flex; gap:.5rem; align-items:center; flex-wrap:wrap}
+  .muted{opacity:.7;font-size:.9rem}
+  .pill{padding:.2rem .5rem; border:1px solid #ffffff28; border-radius:999px; font-size:.75rem}
+  .admin{color:#b4f5c6; border-color:#b4f5c680}
+  .notice{position:fixed; left:50%; top:calc(1rem + 58px); transform:translateX(-50%); z-index:5; background:#101b33; border:1px solid #ffffff24; padding:.5rem .8rem; border-radius:10px; display:none}
+  @media (max-width:700px){ .hud{gap:.35rem} .cta{left:50%; transform:translateX(-50%);}}
+</style>
+</head>
+<body>
+  <canvas id="star-canvas" aria-hidden="true"></canvas>
+  <div class="bg" aria-hidden="true"></div>
+  <div id="message-layer"></div>
+
+  <div class="hud" role="toolbar">
+    <h1>✨ Add your star for Isa</h1>
+    <span class="pill">5000 twinkles</span>
+    <span id="count" class="pill">0 messages</span>
+    <div class="spacer"></div>
+    <button id="addBtn" class="accent">Add Your Star ✨</button>
+    <button id="loginBtn" class="ghost">Admin</button>
+    <button id="logoutBtn" class="ghost" style="display:none">Sign out</button>
+  </div>
+
+  <div class="cta">
+    <span class="muted">Tip: click the sky to place your star</span>
+  </div>
+
+  <!-- Add Star Modal -->
+  <dialog id="addModal">
+    <form id="addForm" method="dialog">
+      <h3>Add your star ✨</h3>
+      <p class="muted">You clicked at: <span id="coordsText">x0,y0</span>. Enter your name & message.</p>
+      <div class="field">
+        <label>Name</label>
+        <input id="nameInput" maxlength="40" required placeholder="Your name">
+      </div>
+      <div class="field">
+        <label>Message</label>
+        <textarea id="msgInput" maxlength="300" required placeholder="Write a sweet note…"></textarea>
+      </div>
+      <div class="row">
+        <button type="submit" class="accent">Save Star</button>
+        <button type="button" id="cancelAdd" class="ghost">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- View/Edit Modal -->
+  <dialog id="viewModal">
+    <div id="viewContent"></div>
+    <div class="row" style="margin-top:.75rem">
+      <button id="closeView" class="ghost">Close</button>
+      <div class="spacer"></div>
+      <button id="editBtn" class="ghost" style="display:none">Edit</button>
+      <button id="deleteBtn" class="danger" style="display:none">Delete</button>
+    </div>
+  </dialog>
+
+  <!-- Edit Modal -->
+  <dialog id="editModal">
+    <form id="editForm" method="dialog">
+      <h3>Edit message</h3>
+      <div class="field">
+        <label>Name</label>
+        <input id="editName" maxlength="40" required>
+      </div>
+      <div class="field">
+        <label>Message</label>
+        <textarea id="editMsg" maxlength="300" required></textarea>
+      </div>
+      <div class="row">
+        <button type="submit" class="accent">Save</button>
+        <button type="button" id="cancelEdit" class="ghost">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Admin Login -->
+  <dialog id="adminModal">
+    <form id="adminForm" method="dialog">
+      <h3>Admin sign in</h3>
+      <p class="muted">Admins can edit or delete stars and export/import.</p>
+      <div class="field">
+        <label>Email</label>
+        <input id="adminEmail" type="email" placeholder="admin@example.com" required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="adminPass" type="password" required value="isasings111">
+      </div>
+      <div class="row">
+        <button type="submit" class="accent">Sign in</button>
+        <button type="button" id="cancelAdmin" class="ghost">Cancel</button>
+      </div>
+      <div class="row" style="margin-top:.5rem; gap:.4rem">
+        <button type="button" id="exportBtn" class="ghost" style="display:none">Export JSON</button>
+        <label class="btn ghost" style="display:none" id="importLabel">Import JSON<input id="importFile" type="file" accept="application/json" hidden></label>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="notice" class="notice" role="status"></div>
+
+  <!-- Firebase (modular v10) -->
+  <script type="module">
+    /* ========== Decorative starfield (5000) ========== */
+    const canvas = document.getElementById('star-canvas');
+    const ctx = canvas.getContext('2d', { alpha: true });
+    let W=innerWidth, H=innerHeight; canvas.width=W; canvas.height=H;
+    const N = 5000;
+    const stars = Array.from({length:N}, () => ({
+      x: Math.random()*W,
+      y: Math.random()*H*0.9,                    // leave a touch of room for UI
+      r: Math.random()*1.1 + 0.2,
+      tw: Math.random()*Math.PI*2,
+      sp: 0.002 + Math.random()*0.004
+    }));
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      for(const s of stars){
+        s.tw += s.sp;
+        const a = 0.25 + 0.75*(0.5+0.5*Math.sin(s.tw));
+        ctx.globalAlpha = a;
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.fillStyle='#ffffff'; ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+    addEventListener('resize', ()=>{W=innerWidth; H=innerHeight; canvas.width=W; canvas.height=H;});
+    draw();
+
+    /* ========== Firebase (Firestore + Auth) ========== */
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, signInAnonymously, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    // TODO: Firebase config here (Project settings → Web app)
+    const firebaseConfig = {
+      apiKey: "AIzaSyADhhtFZZcRMOwqU_dwR7RMHITYsfvXDUY",
+  authDomain: "isa-s-25th-birthday.firebaseapp.com",
+  projectId: "isa-s-25th-birthday",
+  storageBucket: "isa-s-25th-birthday.firebasestorage.app",
+  messagingSenderId: "590841309751",
+  appId: "1:590841309751:web:bb444deda0263f1b9fedb2"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+    const auth = getAuth(app);
+
+    // Everyone auto-joins anonymously (so rules can require auth even for creates)
+    signInAnonymously(auth).catch(console.error);
+
+    /* ========== Message stars layer ========== */
+    const layer = document.getElementById('message-layer');
+    const addBtn = document.getElementById('addBtn');
+    const countBadge = document.getElementById('count');
+    const addModal = document.getElementById('addModal');
+    const adminModal = document.getElementById('adminModal');
+    const viewModal = document.getElementById('viewModal');
+    const editModal = document.getElementById('editModal');
+    const adminEmailInput = document.getElementById('adminEmail');
+    const adminPassInput = document.getElementById('adminPass');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const importLabel = document.getElementById('importLabel');
+    const importFile = document.getElementById('importFile');
+    const notice = document.getElementById('notice');
+
+    let admin = false;
+    let currentDocId = null;
+
+    function toast(text, ms=2000){
+      notice.textContent = text; notice.style.display='block';
+      setTimeout(()=>notice.style.display='none', ms);
+    }
+
+    // Convert px -> percent (so layout is responsive across screens)
+    function toPct(x,y){ return { px: x, py: y, x: (x/innerWidth), y: (y/innerHeight) }; }
+    function fromPct(x,y){ return { x: x*innerWidth, y: y*innerHeight }; }
+
+    // Capture click for placing a new star
+    let pendingPos = null;
+    addBtn.addEventListener('click', ()=>{
+      document.body.style.cursor='crosshair';
+      toast('Click anywhere in the sky to place your star…', 2500);
+      const clickOnce = (ev)=>{
+        document.removeEventListener('click', clickOnce);
+        document.body.style.cursor='default';
+        const {clientX, clientY} = ev;
+        pendingPos = toPct(clientX, clientY);
+        // avoid clicks on UI bars (top ~110px) / grass (bottom ~140px of most images)
+        if(clientY < 90 || clientY > innerHeight-140){ toast('Try a bit higher in the sky ✨', 2000); pendingPos=null; return;}
+        document.getElementById('coordsText').textContent = `(${Math.round(pendingPos.x*100)}%, ${Math.round(pendingPos.y*100)}%)`;
+        addModal.showModal();
+      };
+      setTimeout(()=>document.addEventListener('click', clickOnce), 0);
+    });
+    document.getElementById('cancelAdd').onclick = ()=>addModal.close();
+
+    // Add star to Firestore
+    document.getElementById('addForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      if(!pendingPos){ addModal.close(); return;}
+      const name = document.getElementById('nameInput').value.trim();
+      const message = document.getElementById('msgInput').value.trim();
+      await addDoc(collection(db, 'messages'), {
+        name, message, x: pendingPos.x, y: pendingPos.y, createdAt: serverTimestamp()
+      });
+      addModal.close(); toast('Your star is live ⭐');
+    });
+
+    // Render a message star
+    function renderStar(id, data){
+      // create element if missing
+      let el = document.querySelector(`.mstar[data-id="${id}"]`);
+      if(!el){
+        el = document.createElement('div'); el.className='mstar'; el.dataset.id=id;
+        const tip = document.createElement('div'); tip.className='tooltip'; tip.textContent=data.name; el.appendChild(tip);
+        el.addEventListener('mouseenter', ()=> tip.style.display='block');
+        el.addEventListener('mouseleave', ()=> tip.style.display='none');
+        el.addEventListener('click', ()=>openView(id, data));
+        layer.appendChild(el);
+      }
+      const {x,y} = fromPct(data.x, data.y);
+      el.style.left = `${x}px`; el.style.top = `${y}px`;
+    }
+
+    function removeStar(id){
+      const el = document.querySelector(`.mstar[data-id="${id}"]`);
+      if(el) el.remove();
+    }
+
+    // Live subscription
+    const q = query(collection(db,'messages'), orderBy('createdAt','asc'));
+    onSnapshot(q, snap=>{
+      countBadge.textContent = `${snap.size} messages`;
+      const liveIds = new Set();
+      snap.forEach(docu=>{
+        const id = docu.id, data = docu.data();
+        liveIds.add(id);
+        renderStar(id, data);
+      });
+      // cleanup removed
+      document.querySelectorAll('.mstar').forEach(el=>{
+        if(!liveIds.has(el.dataset.id)) el.remove();
+      });
+    });
+
+    /* ----- View / Edit / Delete ----- */
+    const viewContent = document.getElementById('viewContent');
+    document.getElementById('closeView').onclick = ()=>viewModal.close();
+
+    function openView(id, data){
+      currentDocId = id;
+      viewContent.innerHTML = `
+        <h3>${escapeHtml(data.name)}</h3>
+        <p style="white-space:pre-wrap">${escapeHtml(data.message)}</p>
+        <p class="muted">Click star to see on the sky. Posted ${data.createdAt?.toDate ? data.createdAt.toDate().toLocaleString() : 'just now'}.</p>
+      `;
+      // Admin controls
+      document.getElementById('editBtn').style.display = admin ? 'inline-block' : 'none';
+      document.getElementById('deleteBtn').style.display = admin ? 'inline-block' : 'none';
+      viewModal.showModal();
+
+      // center tooltip? just scroll not needed, stars fixed
+    }
+
+    document.getElementById('deleteBtn').onclick = async ()=>{
+      if(!admin || !currentDocId) return;
+      if(confirm('Delete this star?')){
+        await deleteDoc(doc(db,'messages', currentDocId));
+        viewModal.close();
+        toast('Star deleted');
+      }
+    };
+
+    const editForm = document.getElementById('editForm');
+    document.getElementById('editBtn').onclick = ()=>{
+      const starEl = document.querySelector(`.mstar[data-id="${currentDocId}"]`);
+      if(!starEl) return;
+      // grab existing data from view
+      const name = viewContent.querySelector('h3').textContent;
+      const message = viewContent.querySelector('p').textContent;
+      document.getElementById('editName').value = name;
+      document.getElementById('editMsg').value = message;
+      viewModal.close(); editModal.showModal();
+    };
+    document.getElementById('cancelEdit').onclick = ()=>editModal.close();
+    editForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      if(!admin || !currentDocId) return;
+      await updateDoc(doc(db,'messages', currentDocId), {
+        name: document.getElementById('editName').value.trim(),
+        message: document.getElementById('editMsg').value.trim()
+      });
+      editModal.close(); toast('Updated ⭐');
+    });
+
+    /* ----- Admin sign-in / sign-out ----- */
+    loginBtn.onclick = ()=>adminModal.showModal();
+    document.getElementById('cancelAdmin').onclick = ()=>adminModal.close();
+    document.getElementById('logoutBtn').onclick = ()=>signOut(auth);
+
+    document.getElementById('adminForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const email = adminEmailInput.value.trim();
+      const pass  = adminPassInput.value;
+      try{
+        await signInWithEmailAndPassword(auth, email, pass);
+        adminModal.close(); toast('Signed in as admin');
+      }catch(err){
+        alert('Sign-in failed: ' + err.message);
+      }
+    });
+
+    onAuthStateChanged(auth, (user)=>{
+      admin = !!(user && user.email); // email/password login → admin by rules
+      document.querySelector('.hud').classList.toggle('admin', admin);
+      loginBtn.style.display  = admin ? 'none' : 'inline-block';
+      logoutBtn.style.display = admin ? 'inline-block' : 'none';
+      exportBtn.style.display = admin ? 'inline-block' : 'none';
+      importLabel.style.display = admin ? 'inline-flex' : 'none';
+    });
+
+    /* ----- Export / Import (admin) ----- */
+    exportBtn.onclick = async ()=>{
+      const snap = await (await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"))
+        .getDocs(collection(db,'messages'));
+      const data = [];
+      snap.forEach(d=>data.push({id:d.id, ...d.data()}));
+      const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+      const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='isa-stars.json'; a.click();
+    };
+    importFile.onchange = async (e)=>{
+      const file = e.target.files?.[0]; if(!file) return;
+      const text = await file.text();
+      const arr = JSON.parse(text);
+      for(const row of arr){
+        // if id exists update, else add
+        const ref = row.id ? doc(db,'messages',row.id) : null;
+        if(ref){ await updateDoc(ref, row); } else { await addDoc(collection(db,'messages'), row); }
+      }
+      toast('Import complete');
+    };
+
+    function escapeHtml(str){ return str.replace(/[&<>"']/g,s=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[s])) }
+  </script>
+</body>
+</html>
