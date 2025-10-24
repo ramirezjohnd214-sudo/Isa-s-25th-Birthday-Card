@@ -255,7 +255,22 @@
   background: rgba(255, 255, 255, 0.3);
   transform: scale(1.05);
 }
+.message-modal {
+  border: none;
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 400px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+  animation: fadeIn 0.3s ease;
+}
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
 </style>
 </head>
 <body>
@@ -305,15 +320,11 @@
   </dialog>
 
   <!-- View/Edit Modal -->
-  <dialog id="viewModal">
-    <div id="viewContent"></div>
-    <div class="row" style="margin-top:.75rem">
-      <button id="closeView" class="ghost">Close</button>
-      <div class="spacer"></div>
-      <button id="editBtn" class="ghost" style="display:none">Edit</button>
-      <button id="deleteBtn" class="danger" style="display:none">Delete</button>
-    </div>
-  </dialog>
+  <dialog id="viewModal" class="message-modal">
+  <h2 id="viewName"></h2>
+  <p id="viewMessage"></p>
+  <button id="deleteBtn" class="danger" style="display:none">Delete</button>
+</dialog>
 
   <!-- Edit Modal -->
   <dialog id="editModal">
