@@ -82,12 +82,72 @@
     font-size:.8rem; white-space:nowrap; pointer-events:none; backdrop-filter:blur(4px)
   }
   /* UI BAR */
-  .hud{
-    position:fixed; left:1rem; right:1rem; top:1rem; z-index:3; display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;
-    background:var(--ui); border:1px solid #ffffff24; padding:.6rem .8rem; border-radius:12px; backdrop-filter:blur(6px)
+  /* Smaller, floating HUD in the top-right */
+.hud {
+  position:fixed;
+  top:1rem;
+  right:1rem;
+  z-index:5;
+
+  background:var(--ui);
+  border:1px solid #ffffff24;
+  backdrop-filter:blur(6px);
+
+  border-radius:12px;
+  padding:.6rem .8rem;
+
+  display:flex;
+  flex-direction:column;
+  gap:.5rem;
+
+  max-width:220px;
+  width:max-content;
+}
+
+/* Title smaller, no huge bar */
+.hud-title {
+  font-size:.9rem;
+  font-weight:600;
+  color:#e6f1ff;
+  margin:0;
+  line-height:1.2;
+  text-wrap:balance;
+}
+
+/* Stack buttons vertically on mobile */
+.hud-buttons {
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem;
+}
+
+.hud-buttons button {
+  flex:1 1 auto;
+  white-space:nowrap;
+  font-size:.8rem;
+  line-height:1.2;
+  padding:.5rem .6rem;
+  border-radius:10px;
+}
+
+/* Remove pills since we're not showing message count anymore */
+.pill { display:none!important; }
+
+/* Remove giant CTA at the bottom if you want the bottom bar gone too */
+.cta { display:none!important; }
+
+@media (min-width:600px){
+  .hud {
+    max-width:none;
+    width:auto;
   }
-  .hud h1{font-size:1rem;margin:0;font-weight:600; letter-spacing:.3px}
-  .hud .spacer{flex:1}
+  .hud-buttons {
+    flex-wrap:nowrap;
+  }
+  .hud-buttons button {
+    flex:0 0 auto;
+  }
+}
   button, .btn{
     background:#111933; color:#e6f1ff; border:1px solid #ffffff28; border-radius:10px; padding:.5rem .75rem; font-weight:600; cursor:pointer;
   }
@@ -115,6 +175,17 @@
   .admin{color:#b4f5c6; border-color:#b4f5c680}
   .notice{position:fixed; left:50%; top:calc(1rem + 58px); transform:translateX(-50%); z-index:5; background:#101b33; border:1px solid #ffffff24; padding:.5rem .8rem; border-radius:10px; display:none}
   @media (max-width:700px){ .hud{gap:.35rem} .cta{left:50%; transform:translateX(-50%);}}
+.hud {
+  display: none !important;
+}
+.hud {
+  left:auto;
+  right:1rem;
+  max-width:220px;
+  width:auto;
+  display:flex;
+  flex-direction:column;
+}
 </style>
 </head>
 <body>
@@ -124,15 +195,18 @@
 
   <div id="message-layer"></div>
 
-  <div class="hud" role="toolbar">
-    <h1>✨ Add your star for Isa</h1>
-    <span class="pill">5000 twinkles</span>
-    <span id="count" class="pill">0 messages</span>
-    <div class="spacer"></div>
+  <div class="hud" role="toolbar" style="display:none !important;">
+  <div class="hud-top">
+    <h1 class="hud-title">✨ Add your star for Isa</h1>
+  </div>
+
+  <div class="hud-buttons">
     <button id="addBtn" class="accent">Add Your Star ✨</button>
     <button id="loginBtn" class="ghost">Admin</button>
     <button id="logoutBtn" class="ghost" style="display:none">Sign out</button>
   </div>
+</div>
+
 
   <div class="cta">
     <span class="muted">Tip: click the sky to place your star</span>
@@ -456,7 +530,27 @@ el.dataset.id=id;
     /* ----- Export / Import (admin) ----- */
     exportBtn.onclick = async ()=>{
       const snap = await (await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"))
-        .getDocs(collection(db,'messages'));
+        import { onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+onSnapshot(collection(db, "messages"), snapshot => {
+  snapshot.docChanges().forEach(change => {
+    const id = change.doc.id;
+    const data = change.doc.data();
+
+    if (change.type === "added") {
+      renderStar(id, data);
+    } else if (change.type === "removed") {
+      // 🔥 Remove the deleted star from the card
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.transition = "opacity 0.4s ease";
+        el.style.opacity = 0;
+        setTimeout(() => el.remove(), 400);
+      }
+    }
+  });
+});
+
       const data = [];
       snap.forEach(d=>data.push({id:d.id, ...d.data()}));
       const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
