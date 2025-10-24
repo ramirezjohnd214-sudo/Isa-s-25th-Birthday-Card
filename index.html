@@ -434,37 +434,38 @@ box-shadow: 0 0 25px 8px rgba(255,255,255,0.95),
 }
 .firework {
   position: absolute;
-  width: 5px;
-  height: 5px;
+  width: 3px;
+  height: 3px;
   background: radial-gradient(circle, #fff 0%, #ffd700 60%, transparent 100%);
   border-radius: 50%;
   pointer-events: none;
-  animation: shootUp 1.2s ease-out forwards;
+  animation: shootUp 1.5s ease-out forwards;
   z-index: 1;
-  box-shadow: 0 0 15px 5px rgba(255,255,255,0.8);
+  opacity: 0.9;
+  box-shadow: 0 0 8px rgba(255,255,255,0.8);
 }
 
 @keyframes shootUp {
   0% { transform: translateY(0); opacity: 1; }
-  80% { opacity: 1; }
-  100% { transform: translateY(-450px); opacity: 0; }
+  100% { transform: translateY(-600px); opacity: 0; }
 }
 
 .explosion {
   position: absolute;
-  width: 4px;
-  height: 4px;
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
   pointer-events: none;
   animation: explode 1.8s ease-out forwards;
   mix-blend-mode: screen;
-  filter: blur(1px);
+  filter: blur(0.5px);
 }
 
 @keyframes explode {
-  0% { transform: scale(0.5); opacity: 1; }
-  70% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(1.4) translate(var(--x), var(--y)); opacity: 0; }
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.2) translate(var(--x), var(--y)); opacity: 0; }
+}
+00% { transform: scale(1.4) translate(var(--x), var(--y)); opacity: 0; }
 }
 </style>
 </head>
@@ -930,24 +931,39 @@ spawnShootingStar();
 function createFirework() {
   const fw = document.createElement("div");
   fw.className = "firework";
-  fw.style.left = Math.random() * window.innerWidth + "px";
+
+  // random horizontal start position
+  const startX = Math.random() * window.innerWidth;
+  const distanceScale = 0.5 + Math.random() * 0.5; // 0.5 = far away, 1 = closer
+
+  fw.style.left = startX + "px";
   fw.style.bottom = "0px";
+  fw.style.transform = `scale(${distanceScale})`; // smaller = farther away
+  fw.dataset.scale = distanceScale; // store scale for explosion reference
+
   document.body.appendChild(fw);
 
   fw.addEventListener("animationend", () => {
     fw.remove();
-    const baseY = window.innerHeight * (0.4 + Math.random() * 0.2);
-    createExplosion(parseInt(fw.style.left), baseY);
+
+    // farther fireworks go higher
+    const height = window.innerHeight * (0.5 + Math.random() * 0.3);
+    const x = startX;
+    const y = window.innerHeight - height * distanceScale;
+
+    createExplosion(x, y, distanceScale);
   });
 }
 
-function createExplosion(x, y) {
+function createExplosion(x, y, scale = 1) {
   const colors = [
-    "#ffd700", "#ff69b4", "#00ffff", "#87cefa", "#ffffff",
-    "#ffa500", "#ff4500", "#adff2f", "#00bfff", "#ffb6c1"
+    "#ffd700", "#ff69b4", "#87cefa", "#ffffff",
+    "#ffa500", "#adff2f", "#ffb6c1", "#00bfff"
   ];
-  const burstSize = 25 + Math.floor(Math.random() * 30);
-  const spread = 200 + Math.random() * 200;
+
+  const burstSize = 20 + Math.floor(Math.random() * 30);
+  const spread = 100 * scale + Math.random() * 120 * scale; // smaller spread for distant ones
+  const glow = 6 * scale;
 
   for (let i = 0; i < burstSize; i++) {
     const spark = document.createElement("div");
@@ -955,17 +971,19 @@ function createExplosion(x, y) {
     spark.style.left = `${x}px`;
     spark.style.top = `${y}px`;
     spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+    spark.style.width = `${1.5 + Math.random() * 3 * scale}px`;
+    spark.style.height = spark.style.width;
+    spark.style.boxShadow = `0 0 ${6 + glow}px ${spark.style.background}`;
     spark.style.setProperty("--x", `${(Math.random() - 0.5) * spread}px`);
     spark.style.setProperty("--y", `${(Math.random() - 0.5) * spread}px`);
-    spark.style.width = `${2 + Math.random() * 4}px`;
-    spark.style.height = spark.style.width;
-    spark.style.boxShadow = `0 0 ${8 + Math.random() * 12}px ${spark.style.background}`;
+    spark.style.opacity = 0.8 * scale + 0.2;
+
     document.body.appendChild(spark);
     setTimeout(() => spark.remove(), 1800);
   }
 }
 
-// 🎇 Launch a firework every 5 seconds
+// 🎇 launch every 5 seconds
 setInterval(() => {
   createFirework();
 }, 5000);
