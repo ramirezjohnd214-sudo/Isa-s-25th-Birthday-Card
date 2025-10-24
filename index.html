@@ -38,12 +38,29 @@
   #star-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
   /* INTERACTIVE STAR LAYER (DOM) */
   #message-layer{position:fixed;inset:0;z-index:2;pointer-events:none;}
-  .mstar{
-    position:absolute; width:8px; height:8px; border-radius:50%;
-    box-shadow:0 0 10px 2px var(--glow), 0 0 2px 1px #fff;
-    background:#fff; cursor:pointer; pointer-events:auto; transition:transform .12s;
-  }
-  .mstar:hover{transform:scale(1.5)}
+  /* Add this keyframes block (anywhere in <style>) */
+@keyframes twinklePulse {
+  0%   { transform: scale(1);   box-shadow: 0 0 10px 2px #ffffffd0, 0 0 2px 1px #fff; opacity: 0.9; }
+  50%  { transform: scale(1.18); box-shadow: 0 0 16px 4px #ffffffee, 0 0 3px 2px #fff; opacity: 1; }
+  100% { transform: scale(1);   box-shadow: 0 0 10px 2px #ffffffd0, 0 0 2px 1px #fff; opacity: 0.9; }
+}
+
+/* Update your .mstar rules */
+.mstar{
+  position:absolute; width:8px; height:8px; border-radius:50%;
+  background:#fff; cursor:pointer; pointer-events:auto;
+  /* existing glow (keep): */
+  box-shadow:0 0 10px 2px var(--glow), 0 0 2px 1px #fff;
+
+  /* smooth hover still works */
+  transition:transform .12s;
+
+  /* NEW: twinkle animation (duration customizable via CSS var) */
+  animation: twinklePulse var(--dur, 2.8s) ease-in-out infinite;
+}
+
+/* Keep your hover behavior */
+.mstar:hover{ transform: scale(1.5); }
   .tooltip{
     position:absolute; transform:translate(-50%,-160%);
     padding:.25rem .5rem; background:#000a; border:1px solid #ffffff30; border-radius:.5rem;
@@ -296,7 +313,10 @@
       // create element if missing
       let el = document.querySelector(`.mstar[data-id="${id}"]`);
       if(!el){
-        el = document.createElement('div'); el.className='mstar'; el.dataset.id=id;
+        el = document.createElement('div'); el.className='mstar';
+el.style.setProperty('--dur', `${(2 + Math.random()*2).toFixed(2)}s`); // 2–4s
+el.style.animationDelay = `${(Math.random()*2).toFixed(2)}s`;          // 0–2s
+el.dataset.id=id;
         const tip = document.createElement('div'); tip.className='tooltip'; tip.textContent=data.name; el.appendChild(tip);
         el.addEventListener('mouseenter', ()=> tip.style.display='block');
         el.addEventListener('mouseleave', ()=> tip.style.display='none');
