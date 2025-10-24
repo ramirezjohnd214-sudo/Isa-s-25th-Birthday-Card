@@ -449,7 +449,7 @@ box-shadow: 0 0 25px 8px rgba(255,255,255,0.95),
 @keyframes shootUp {
   0% { transform: translateY(0); opacity: 1; }
   90% { opacity: 1; }
-  100% { transform: translateY(-80vh); opacity: 0; }
+  100% { transform: translateY(-100vh); opacity: 0; }
 }
 
 .explosion {
@@ -933,18 +933,36 @@ function createFirework() {
   const fw = document.createElement("div");
   fw.className = "firework";
 
-  const startX = Math.random() * window.innerWidth;
-  const scale = 0.6 + Math.random() * 0.6; // smaller = farther away
+  // Choose depth layer: near (bright & big), mid, or far (small & faint)
+  const depth = Math.random();
+  let scale, opacity, heightMult;
 
+  if (depth < 0.3) {          // FAR
+    scale = 0.4;
+    opacity = 0.6;
+    heightMult = 0.7;
+  } else if (depth < 0.7) {   // MID
+    scale = 0.7;
+    opacity = 0.8;
+    heightMult = 0.85;
+  } else {                    // NEAR
+    scale = 1.0;
+    opacity = 1.0;
+    heightMult = 1.0;
+  }
+
+  const startX = Math.random() * window.innerWidth;
   fw.style.left = `${startX}px`;
+  fw.style.bottom = "0px";
   fw.style.transform = `scale(${scale})`;
+  fw.style.opacity = opacity;
   fw.dataset.scale = scale;
 
   document.body.appendChild(fw);
 
   fw.addEventListener("animationend", () => {
     fw.remove();
-    const peakY = window.innerHeight * (0.3 + Math.random() * 0.3);
+    const peakY = window.innerHeight * (0.3 + Math.random() * 0.3 * heightMult);
     createExplosion(startX, peakY, scale);
   });
 }
@@ -955,8 +973,9 @@ function createExplosion(x, y, scale = 1) {
     "#ffa500", "#adff2f", "#87cefa", "#ffb6c1"
   ];
 
-  const sparks = 30 + Math.floor(Math.random() * 20);
-  const spread = 150 + Math.random() * 100;
+  const sparks = 30 + Math.floor(Math.random() * 25);
+  const spread = 120 * scale + Math.random() * 150 * scale;
+  const duration = 1500 + Math.random() * 800;
 
   for (let i = 0; i < sparks; i++) {
     const s = document.createElement("div");
@@ -964,18 +983,24 @@ function createExplosion(x, y, scale = 1) {
     s.style.left = `${x}px`;
     s.style.top = `${y}px`;
     s.style.background = colors[Math.floor(Math.random() * colors.length)];
-    s.style.width = `${2 * scale}px`;
+    s.style.width = `${2 + Math.random() * 3 * scale}px`;
     s.style.height = s.style.width;
-    s.style.boxShadow = `0 0 ${8 + Math.random() * 10}px ${s.style.background}`;
+    s.style.boxShadow = `0 0 ${8 + 8 * scale}px ${s.style.background}`;
     s.style.setProperty("--x", `${(Math.random() - 0.5) * spread}px`);
     s.style.setProperty("--y", `${(Math.random() - 0.5) * spread}px`);
+    s.style.opacity = 0.7 + 0.3 * scale;
+
     document.body.appendChild(s);
-    setTimeout(() => s.remove(), 2000);
+    setTimeout(() => s.remove(), duration);
   }
 }
 
+// 🎇 Fireworks launch every 5 seconds (and sometimes doubles!)
 setInterval(() => {
   createFirework();
+  if (Math.random() < 0.4) {
+    setTimeout(createFirework, 1000 + Math.random() * 1000); // secondary burst
+  }
 }, 5000);
 </script>
 </body>
