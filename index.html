@@ -19,11 +19,23 @@
   html,body{height:100%;margin:0;background:linear-gradient(to bottom,var(--skyTop),var(--skyBottom));color:#e6f1ff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;overflow:hidden}
   /* BACKGROUND ART */
   .bg{
-    position:fixed; inset:0;
-    background: center bottom / contain no-repeat url("IsaBday.png"); /* ← put your final image file name here */
-    filter: saturate(1) contrast(1.05);
-    pointer-events:none;
-  }
+  position:fixed; inset:0;
+  background-color:#000;
+  background-image:url("background.png");
+  background-repeat:no-repeat;
+  background-position:center center;
+  background-size:contain; /* show full image */
+  filter:saturate(1) contrast(1.05);
+  pointer-events:none;
+}
+.bg::before{
+  content:"";
+  position:absolute; inset:0;
+  background:url("background.png") center/cover no-repeat;
+  filter:blur(25px) brightness(.6) saturate(1.2);
+  transform:scale(1.1);
+  z-index:-1;
+}
   /* CANVAS STARS */
   #star-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
   /* INTERACTIVE STAR LAYER (DOM) */
