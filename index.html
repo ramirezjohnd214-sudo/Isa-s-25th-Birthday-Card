@@ -46,6 +46,20 @@
       opacity: 1; }
   100% { transform: scale(1);   box-shadow: 0 0 10px 2px #ffffffd0, 0 0 2px 1px #fff; opacity: 0.9; }
 }
+@keyframes sparkleBurst {
+  0% { transform: scale(0); opacity: 0.8; box-shadow: 0 0 10px 4px #fff; }
+  50% { transform: scale(2.5); opacity: 1; box-shadow: 0 0 20px 8px #fff, 0 0 40px 12px #ffd700; }
+  100% { transform: scale(0); opacity: 0; box-shadow: none; }
+}
+.sparkle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  pointer-events: none;
+  animation: sparkleBurst 0.9s ease-out forwards;
+}
 /* Update your .mstar rules */
 .mstar{
   position:absolute; width:8px; height:8px; border-radius:50%;
@@ -296,7 +310,14 @@
       setTimeout(()=>document.addEventListener('click', clickOnce), 0);
     });
     document.getElementById('cancelAdd').onclick = ()=>addModal.close();
-
+function sparkleAt(x, y) {
+  const sparkle = document.createElement('div');
+  sparkle.className = 'sparkle';
+  sparkle.style.left = `${x}px`;
+  sparkle.style.top = `${y}px`;
+  document.body.appendChild(sparkle);
+  setTimeout(() => sparkle.remove(), 900);
+}
     // Add star to Firestore
     document.getElementById('addForm').addEventListener('submit', async (e)=>{
       e.preventDefault();
@@ -306,6 +327,8 @@
       await addDoc(collection(db, 'messages'), {
         name, message, x: pendingPos.x, y: pendingPos.y, createdAt: serverTimestamp()
       });
+sparkleAt(x, y);
+
       addModal.close(); toast('Your star is live ⭐');
     });
 
