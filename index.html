@@ -613,10 +613,14 @@ function createFirework() {
   else if (depth < 0.7) { scale = 0.7; opacity = 0.8; heightMult = 0.85; }
   else { scale = 1.0; opacity = 1.0; heightMult = 1.0; }
 
-  const startX = Math.random() * window.innerWidth;
-  const startY = window.innerHeight * 0.55; // launch slightly above grass
-  const peakY = window.innerHeight * (0.25 + Math.random() * 0.15); // explode near top 25-40%
-  const arcX = startX + (Math.random() - 0.5) * 200; // slight horizontal curve
+ const startX = Math.random() * window.innerWidth;
+ const startY = window.innerHeight * 0.55; // launch slightly above grass
+
+ // 🎇 Aim explosions toward the center of the screen
+ const centerX = window.innerWidth / 2;
+ const peakY = window.innerHeight * (0.35 + Math.random() * 0.1); // middle-top area
+ // arc slightly toward the center
+ const arcX = centerX + (startX - centerX) * 0.3 + (Math.random() - 0.5) * 100;
 
   fw.style.left = `${startX}px`;
   fw.style.bottom = `${startY}px`;
