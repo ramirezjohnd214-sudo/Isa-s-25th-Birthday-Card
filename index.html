@@ -731,7 +731,17 @@ const viewModal = document.getElementById("viewModal");
 const viewContent = document.getElementById("viewContent");
 const addBtn = document.getElementById("addBtn");
 const cancelAdd = document.getElementById("cancelAdd");
+// Allow user to click anywhere in the sky to choose star position
+document.addEventListener("click", (e) => {
+  // Prevent clicks on buttons or modals from triggering
+  if (e.target.closest("button, dialog")) return;
 
+  currentX = e.clientX;
+  currentY = e.clientY;
+
+  document.getElementById("coordsText").textContent = `x${Math.round(currentX)}, y${Math.round(currentY)}`;
+  addModal.showModal();
+});
 let currentX = 0, currentY = 0;
 let admin = false;
 
@@ -746,7 +756,7 @@ addForm.onsubmit = async (e) => {
   const name = document.getElementById("nameInput").value.trim();
   const message = document.getElementById("msgInput").value.trim();
   if (!name || !message) return;
-  await addDoc(collection(db, "messages"), { name, message, x: Math.random() * innerWidth, y: Math.random() * innerHeight * 0.8 });
+await addDoc(collection(db, "messages"), { name, message, x: currentX, y: currentY });
   addModal.close();
   renderStars();
 };
@@ -779,6 +789,39 @@ function openView(id, data) {
 document.getElementById("closeView").onclick = () => viewModal.close();
 
 renderStars();
+/* === Admin Login === */
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const adminModal = document.getElementById("adminModal");
+const adminForm = document.getElementById("adminForm");
+const cancelAdmin = document.getElementById("cancelAdmin");
+
+loginBtn.onclick = () => adminModal.showModal();
+cancelAdmin.onclick = () => adminModal.close();
+
+adminForm.onsubmit = async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("adminEmail").value;
+  const pass = document.getElementById("adminPass").value;
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    admin = true;
+    adminModal.close();
+    loginBtn.style.display = "none";
+    logoutBtn.style.display = "inline-block";
+    alert("✅ Admin signed in!");
+  } catch (err) {
+    alert("❌ Login failed: " + err.message);
+  }
+};
+
+logoutBtn.onclick = async () => {
+  await signOut(auth);
+  admin = false;
+  logoutBtn.style.display = "none";
+  loginBtn.style.display = "inline-block";
+  alert("Signed out.");
+};
 // ✅ Firebase connection check
 try {
   console.log("🔥 Checking Firebase connection...");
