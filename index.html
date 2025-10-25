@@ -673,8 +673,6 @@ body.placing-star {
     </form>
   </dialog>
 
-  <div id="notice" class="notice" role="status"></div>
-
   <!-- Firebase (modular v10) -->
 <script type="module">
   /* ===== Starfield Background ===== */
@@ -835,11 +833,7 @@ emojiPicker.addEventListener("click", (e) => {
     msgInput.selectionEnd = start + emoji.length;
   }
 });
-// ✅ Restrict Name field to letters and spaces only
-const nameInput = document.getElementById("nameInput");
-nameInput.addEventListener("input", () => {
-  nameInput.value = nameInput.value.replace(/[^a-zA-Z\s]/g, "");
-});
+
 // Allow user to click anywhere in the sky to choose star position
 let currentX = 0, currentY = 0;
 let admin = false;
@@ -895,27 +889,6 @@ addForm.onsubmit = async (e) => {
   addModal.close();
   renderStars();
 };
-// ✅ Name: only letters + spaces
-const nameInput = document.getElementById("nameInput");
-nameInput.addEventListener("input", () => {
-  nameInput.value = nameInput.value.replace(/[^a-zA-Z\s]/g, "");
-});
-
-// ✅ Emoji Picker Logic (append emoji to message)
-const emojiPicker = document.getElementById("emojiPicker");
-const msgInput = document.getElementById("msgInput");
-
-emojiPicker.addEventListener("click", (e) => {
-  if (e.target.tagName === "SPAN") {
-    const emoji = e.target.textContent;
-    const start = msgInput.selectionStart;
-    const end = msgInput.selectionEnd;
-    msgInput.value =
-      msgInput.value.substring(0, start) + emoji + msgInput.value.substring(end);
-    msgInput.focus();
-    msgInput.selectionEnd = start + emoji.length;
-  }
-});
   // Reset picker
   selectedEmojis = [];
   document.querySelectorAll("#emojiPicker .selected").forEach(el => el.classList.remove("selected"));
