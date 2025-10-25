@@ -571,6 +571,38 @@ body.placing-star {
         <label>Message</label>
         <textarea id="msgInput" maxlength="300" required placeholder="Write a sweet note…"></textarea>
       </div>
+      <div class="field">
+  <label>Emojis (choose one or more 💖)</label>
+  <select id="emojiSelect" multiple size="6">
+    <option>🌟</option>
+    <option>🎂</option>
+    <option>🎈</option>
+    <option>💖</option>
+    <option>🥳</option>
+    <option>✨</option>
+    <option>🎶</option>
+    <option>💫</option>
+    <option>❤️</option>
+    <option>🧡</option>
+    <option>💛</option>
+    <option>💚</option>
+    <option>💙</option>
+    <option>💜</option>
+    <option>🤎</option>
+    <option>🖤</option>
+    <option>🤍</option>
+    <option>💗</option>
+    <option>💓</option>
+    <option>💞</option>
+    <option>💕</option>
+    <option>💘</option>
+    <option>💝</option>
+    <option>🌈</option>
+    <option>🌟</option>
+    <option>🎉</option>
+    <option>🥰</option>
+  </select>
+</div>
       <div class="row">
         <button type="submit" class="accent">Save Star</button>
         <button type="button" id="cancelAdd" class="ghost">Cancel</button>
@@ -812,10 +844,14 @@ addForm.onsubmit = async (e) => {
   e.preventDefault();
   const name = document.getElementById("nameInput").value.trim();
   const message = document.getElementById("msgInput").value.trim();
+ const emojiSelect = document.getElementById("emojiSelect");
+ const emojis = Array.from(emojiSelect.selectedOptions).map(o => o.text).join(" ");
   if (!name || !message) return;
 
   await addDoc(collection(db, "messages"), {
-    name, message,
+    name,
+    message,
+    emojis,
     x: currentX,
     y: currentY
   });
@@ -837,7 +873,7 @@ async function renderStars() {
 
     const tip = document.createElement("div");
     tip.className = "tooltip";
-    tip.textContent = data.name;
+    tip.textContent = `${data.emoji || "🌟"} ${data.name}`;
     el.appendChild(tip);
     layer.appendChild(el);
   });
