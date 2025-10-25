@@ -525,6 +525,7 @@ body.placing-star {
 #notice.show {
   opacity: 1;
   transform: translateX(-50%) scale(1.05);
+  animation: sparkleNotice 3s infinite ease-in-out alternate;
 }
 
 /* subtle sparkle pulse */
@@ -849,9 +850,9 @@ document.addEventListener("click", (e) => {
   if (e.target.closest("button, dialog, .mstar, .tooltip")) return; // ignore UI & stars
 
   isPlacing = false;
-  document.body.classList.remove("placing-star");
   const notice = document.getElementById("notice");
   notice.classList.remove("show");
+  document.body.classList.remove("placing-star");
 
   currentX = e.clientX;
   currentY = e.clientY;
