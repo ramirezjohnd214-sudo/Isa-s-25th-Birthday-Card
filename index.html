@@ -801,6 +801,29 @@ const viewModal = document.getElementById("viewModal");
 const viewContent = document.getElementById("viewContent");
 const addBtn = document.getElementById("addBtn");
 const cancelAdd = document.getElementById("cancelAdd");
+// 🎨 Emoji Picker Logic
+const emojiPicker = document.getElementById("emojiPicker");
+let selectedEmojis = [];
+
+// Split emojis into clickable spans
+emojiPicker.innerHTML = emojiPicker.textContent
+  .trim()
+  .split(/\s+/)
+  .map(e => `<span>${e}</span>`)
+  .join(" ");
+
+emojiPicker.addEventListener("click", (e) => {
+  if (e.target.tagName !== "SPAN") return;
+  const emoji = e.target.textContent;
+
+  if (selectedEmojis.includes(emoji)) {
+    selectedEmojis = selectedEmojis.filter(e => e !== emoji);
+    e.target.classList.remove("selected");
+  } else {
+    selectedEmojis.push(emoji);
+    e.target.classList.add("selected");
+  }
+});
 // Allow user to click anywhere in the sky to choose star position
 let currentX = 0, currentY = 0;
 let admin = false;
@@ -840,18 +863,11 @@ addForm.onsubmit = async (e) => {
   const name = document.getElementById("nameInput").value.trim();
   const message = document.getElementById("msgInput").value.trim();
  const emojiSelect = document.getElementById("emojiSelect");
- const emojis = Array.from(emojiSelect.selectedOptions).map(o => o.text).join(" ");
-  if (!name || !message) return;
-
-  await addDoc(collection(db, "messages"), {
-    name,
-    message,
-    emojis,
-    x: currentX,
-    y: currentY
-  });
-
+ const emojis = selectedEmojis.join(" ");
+ await addDoc(collection(db, "messages"), { name, message, emojis, x: currentX, y: currentY });
   addModal.close();
+  selectedEmojis = [];
+  document.querySelectorAll("#emojiPicker .selected").forEach(el => el.classList.remove("selected"));
   renderStars();
 };
 /* === Display Stars === */
@@ -875,10 +891,7 @@ async function renderStars() {
 }
 
 function openView(id, data) {
-  viewContent.innerHTML = `
-  <h2>${data.emojis || "🌟"} ${data.name}</h2>
-  <p>${data.message}</p>
-`;
+  viewContent.innerHTML = `<h2>${data.emojis || "🌟"} ${data.name}</h2><p>${data.message}</p>`;
   const editBtn = document.getElementById("editBtn");
   const deleteBtn = document.getElementById("deleteBtn");
 
