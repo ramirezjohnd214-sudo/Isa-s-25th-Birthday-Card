@@ -744,13 +744,15 @@ if (e.target.closest("button, dialog, .mstar, .tooltip")) return; // ignore UI +
 });
 let currentX = 0, currentY = 0;
 let admin = false;
+let isPlacing = false; // New flag for Add Star mode
 
 /* === Add Star === */
 let isPlacing = false;
 
+// === Add Star button ===
 addBtn.onclick = () => {
   isPlacing = true;
-  document.getElementById("notice").textContent = "Click anywhere in the sky to place your star 🌟";
+  document.getElementById("notice").textContent = "Click the sky to place your star ✨";
   document.getElementById("notice").style.display = "block";
 };
 
@@ -778,6 +780,24 @@ await addDoc(collection(db, "messages"), { name, message, x: currentX, y: curren
   addModal.close();
   renderStars();
 };
+// === Handle star placement click ===
+document.addEventListener("click", (e) => {
+  if (!isPlacing) return; // only respond if "Add Star" mode is active
+
+  // ignore clicks on UI or existing stars
+  if (e.target.closest("button, dialog, .mstar, .tooltip")) return;
+
+  isPlacing = false; // disable placement mode after click
+  document.getElementById("notice").style.display = "none";
+
+  currentX = e.clientX;
+  currentY = e.clientY;
+
+  document.getElementById("coordsText").textContent =
+    `x${Math.round(currentX)}, y${Math.round(currentY)}`;
+
+  addModal.showModal(); // open the form
+});
 
 /* === Display Stars === */
 async function renderStars() {
