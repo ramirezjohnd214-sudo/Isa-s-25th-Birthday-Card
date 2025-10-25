@@ -588,9 +588,18 @@ body.placing-star {
         <input id="nameInput" maxlength="40" required placeholder="Your name">
       </div>
       <div class="field">
-        <label>Message</label>
-        <textarea id="msgInput" maxlength="300" required placeholder="Write a sweet note…"></textarea>
-      </div>
+  <label>Message</label>
+  <textarea id="msgInput" maxlength="300" required placeholder="Write a sweet note…"></textarea>
+  
+  <!-- ✨ Emoji Picker -->
+  <div class="emoji-picker" id="emojiPicker">
+    <span>🌟</span><span>🎂</span><span>🎈</span><span>💖</span><span>🥳</span><span>✨</span>
+    <span>🎶</span><span>💫</span><span>❤️</span><span>🧡</span><span>💛</span><span>💚</span>
+    <span>💙</span><span>💜</span><span>🤎</span><span>🖤</span><span>🤍</span><span>💗</span>
+    <span>💓</span><span>💞</span><span>💕</span><span>💘</span><span>💝</span><span>🌈</span>
+    <span>🎉</span><span>🥰</span>
+  </div>
+</div>
     <div class="field">
   <label>Choose your emojis 💕 (click one or more)</label>
   <div id="emojiPicker" class="emoji-picker">
@@ -694,7 +703,6 @@ body.placing-star {
   });
   drawStars();
 
-  /* ===== Fireworks: Disney-Style ===== */
   /* ===== Disney-style Arcing Fireworks ===== */
 function createFirework() {
   const fw = document.createElement("div");
@@ -874,19 +882,29 @@ addForm.onsubmit = async (e) => {
   e.preventDefault();
   const name = document.getElementById("nameInput").value.trim();
   const message = document.getElementById("msgInput").value.trim();
-  const emojis = selectedEmojis.join(" ");
-  // ✅ Reject message if it contains non-emoji characters
-  if (!emojiOnly.test(message)) {
-    alert("💬 Please use emojis only in your message!");
+  if (!name || !message) {
+    alert("Please enter both your name and a message ✨");
     return;
   }
-
-  if (!name) return;
-
-  await addDoc(collection(db, "messages"), { name, message, emojis, x: currentX, y: currentY });
+  await addDoc(collection(db, "messages"), { name, message, x: currentX, y: currentY });
   addModal.close();
   renderStars();
+};
+// ✨ Emoji Picker Logic
+const emojiPicker = document.getElementById("emojiPicker");
+const msgInput = document.getElementById("msgInput");
 
+emojiPicker.addEventListener("click", (e) => {
+  if (e.target.tagName === "SPAN") {
+    const emoji = e.target.textContent;
+    const start = msgInput.selectionStart;
+    const end = msgInput.selectionEnd;
+    msgInput.value =
+      msgInput.value.substring(0, start) + emoji + msgInput.value.substring(end);
+    msgInput.focus();
+    msgInput.selectionEnd = start + emoji.length;
+  }
+});
   // Reset picker
   selectedEmojis = [];
   document.querySelectorAll("#emojiPicker .selected").forEach(el => el.classList.remove("selected"));
