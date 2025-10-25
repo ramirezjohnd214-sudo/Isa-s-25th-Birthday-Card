@@ -845,17 +845,16 @@ let currentX = 0, currentY = 0;
 let admin = false;
 let isPlacing = false; // only one declaration!
 
-// === Add Star button ===
+// === Add Star Button ===
 addBtn.onclick = () => {
   isPlacing = true;
   document.body.classList.add("placing-star");
 
   const notice = document.getElementById("notice");
   notice.textContent = "Click the sky to place your star ✨";
-  notice.style.display = "block"; // force it visible
+  notice.style.display = "block";
   notice.classList.add("show");
 
-  // make sure it stays visible at least 3 seconds
   setTimeout(() => {
     if (isPlacing) notice.classList.add("show");
   }, 50);
