@@ -775,46 +775,37 @@ const viewContent = document.getElementById("viewContent");
 const addBtn = document.getElementById("addBtn");
 const cancelAdd = document.getElementById("cancelAdd");
 // Allow user to click anywhere in the sky to choose star position
-document.addEventListener("click", (e) => {
-  // Prevent clicks on buttons or modals from triggering
-if (e.target.closest("button, dialog, .mstar, .tooltip")) return; // ignore UI + stars
-
-  currentX = e.clientX;
-  currentY = e.clientY;
-
-  document.getElementById("coordsText").textContent = `x${Math.round(currentX)}, y${Math.round(currentY)}`;
-  addModal.showModal();
-});
 let currentX = 0, currentY = 0;
 let admin = false;
-let isPlacing = false; // New flag for Add Star mode
+let isPlacing = false; // only one declaration!
 
-/* === Add Star === */
-let isPlacing = false;
-
-// === Add Star button ===
 // === Add Star button ===
 addBtn.onclick = () => {
   isPlacing = true;
-  document.body.classList.add("placing-star"); // change cursor ✨
+  document.body.classList.add("placing-star"); // ✨ change cursor
   const notice = document.getElementById("notice");
   notice.textContent = "Click the sky to place your star ✨";
-  notice.classList.add("show"); // show with fade animation
+  notice.classList.add("show"); // show floating notice
 };
 
+// === Handle star placement click ===
 document.addEventListener("click", (e) => {
-  if (!isPlacing) return;
-  if (e.target.closest("button, dialog")) return; // ignore UI clicks
+  if (!isPlacing) return; // only respond in "Add Star" mode
+  if (e.target.closest("button, dialog, .mstar, .tooltip")) return; // ignore UI & stars
 
   isPlacing = false;
-  document.getElementById("notice").style.display = "none";
+  document.body.classList.remove("placing-star");
+  const notice = document.getElementById("notice");
+  notice.classList.remove("show");
 
   currentX = e.clientX;
   currentY = e.clientY;
+  document.getElementById("coordsText").textContent =
+    `x${Math.round(currentX)}, y${Math.round(currentY)}`;
 
-  document.getElementById("coordsText").textContent = `x${Math.round(currentX)}, y${Math.round(currentY)}`;
-  addModal.showModal();
+  addModal.showModal(); // open star form
 });
+
 cancelAdd.onclick = () => addModal.close();
 
 addForm.onsubmit = async (e) => {
@@ -822,31 +813,16 @@ addForm.onsubmit = async (e) => {
   const name = document.getElementById("nameInput").value.trim();
   const message = document.getElementById("msgInput").value.trim();
   if (!name || !message) return;
-await addDoc(collection(db, "messages"), { name, message, x: currentX, y: currentY });
+
+  await addDoc(collection(db, "messages"), {
+    name, message,
+    x: currentX,
+    y: currentY
+  });
+
   addModal.close();
   renderStars();
 };
-// === Handle star placement click ===
-document.addEventListener("click", (e) => {
-  if (!isPlacing) return; // only respond if "Add Star" mode is active
-
-  // ignore clicks on UI or existing stars
-  if (e.target.closest("button, dialog, .mstar, .tooltip")) return;
-
-isPlacing = false; // disable placement mode after click
-document.body.classList.remove("placing-star"); // ✅ keep this line — it resets the cursor
-const notice = document.getElementById("notice");
-notice.classList.remove("show");
-
-  currentX = e.clientX;
-  currentY = e.clientY;
-
-  document.getElementById("coordsText").textContent =
-    `x${Math.round(currentX)}, y${Math.round(currentY)}`;
-
-  addModal.showModal(); // open the form
-});
-
 /* === Display Stars === */
 async function renderStars() {
   layer.innerHTML = "";
