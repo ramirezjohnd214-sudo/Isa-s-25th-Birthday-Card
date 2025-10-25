@@ -801,6 +801,11 @@ const viewModal = document.getElementById("viewModal");
 const viewContent = document.getElementById("viewContent");
 const addBtn = document.getElementById("addBtn");
 const cancelAdd = document.getElementById("cancelAdd");
+// ✅ Restrict Name field to letters and spaces only
+const nameInput = document.getElementById("nameInput");
+nameInput.addEventListener("input", () => {
+  nameInput.value = nameInput.value.replace(/[^a-zA-Z\s]/g, "");
+});
 // 🎨 Emoji Picker Logic
 const emojiPicker = document.getElementById("emojiPicker");
 let selectedEmojis = [];
