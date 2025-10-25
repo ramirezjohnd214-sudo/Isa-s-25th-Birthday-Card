@@ -873,14 +873,17 @@ async function renderStars() {
 
     const tip = document.createElement("div");
     tip.className = "tooltip";
-    tip.textContent = `${data.emoji || "🌟"} ${data.name}`;
+    tip.textContent = `${data.emojis || "🌟"} ${data.name}`;
     el.appendChild(tip);
     layer.appendChild(el);
   });
 }
 
 function openView(id, data) {
-  viewContent.innerHTML = `<h2>${data.name}</h2><p>${data.message}</p>`;
+  viewContent.innerHTML = `
+  <h2>${data.emojis || "🌟"} ${data.name}</h2>
+  <p>${data.message}</p>
+`;
   const editBtn = document.getElementById("editBtn");
   const deleteBtn = document.getElementById("deleteBtn");
 
