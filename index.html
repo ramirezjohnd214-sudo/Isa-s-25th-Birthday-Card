@@ -518,9 +518,7 @@ body.placing-star {
   box-shadow: 0 0 15px rgba(255,255,255,0.3);
   transition: opacity 0.6s ease, transform 0.6s ease;
   z-index: 999;
-  animation: sparkleNotice 3s infinite ease-in-out alternate;
 }
-
 /* fade in/out animation */
 #notice.show {
   opacity: 1;
@@ -838,10 +836,16 @@ let isPlacing = false; // only one declaration!
 // === Add Star button ===
 addBtn.onclick = () => {
   isPlacing = true;
-  document.body.classList.add("placing-star"); // ✨ change cursor
+  document.body.classList.add("placing-star");
+
   const notice = document.getElementById("notice");
   notice.textContent = "Click the sky to place your star ✨";
-  notice.classList.add("show"); // show floating notice
+  notice.classList.add("show");
+
+  // Optional: auto-hide after 4 seconds if no click
+  setTimeout(() => {
+    if (isPlacing) notice.classList.remove("show");
+  }, 4000);
 };
 
 // === Handle star placement click ===
