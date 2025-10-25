@@ -862,13 +862,24 @@ addForm.onsubmit = async (e) => {
   e.preventDefault();
   const name = document.getElementById("nameInput").value.trim();
   const message = document.getElementById("msgInput").value.trim();
- const emojiSelect = document.getElementById("emojiSelect");
- const emojis = selectedEmojis.join(" ");
- await addDoc(collection(db, "messages"), { name, message, emojis, x: currentX, y: currentY });
+  const emojis = selectedEmojis.join(" ");
+
+  // ✅ Reject message if it contains non-emoji characters
+  const emojiOnly = /^[\p{Emoji}\p{Extended_Pictographic}\s]+$/u;
+  if (!emojiOnly.test(message)) {
+    alert("💬 Please use emojis only in your message!");
+    return;
+  }
+
+  if (!name) return;
+
+  await addDoc(collection(db, "messages"), { name, message, emojis, x: currentX, y: currentY });
   addModal.close();
+  renderStars();
+
+  // Reset picker
   selectedEmojis = [];
   document.querySelectorAll("#emojiPicker .selected").forEach(el => el.classList.remove("selected"));
-  renderStars();
 };
 /* === Display Stars === */
 async function renderStars() {
