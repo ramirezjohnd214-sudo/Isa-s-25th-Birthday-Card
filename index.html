@@ -868,12 +868,6 @@ addForm.onsubmit = async (e) => {
   const name = document.getElementById("nameInput").value.trim();
   const message = document.getElementById("msgInput").value.trim();
   const emojis = selectedEmojis.join(" ");
-
-  // ✅ Reject message if it contains non-emoji characters
-  const emojiOnly = /^[\p{Emoji}\p{Extended_Pictographic}\s]+$/u;
-  if (!emojiOnly.test(message)) {
-    alert("💬 Please use emojis only in your message!");
-    return;
   }
 
   if (!name) return;
