@@ -849,9 +849,15 @@ addBtn.onclick = () => {
   notice.style.display = "block";
   notice.classList.add("show");
 
+  // Keep it visible for 3 seconds if user doesn’t click
   setTimeout(() => {
-    if (isPlacing) notice.classList.add("show");
-  }, 50);
+    if (isPlacing) {
+      notice.classList.add("show");
+    } else {
+      notice.classList.remove("show");
+      notice.style.display = "none";
+    }
+  }, 3000);
 };
 
 // === Handle star placement click ===
