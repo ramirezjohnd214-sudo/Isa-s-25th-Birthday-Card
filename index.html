@@ -734,7 +734,7 @@ const cancelAdd = document.getElementById("cancelAdd");
 // Allow user to click anywhere in the sky to choose star position
 document.addEventListener("click", (e) => {
   // Prevent clicks on buttons or modals from triggering
-  if (e.target.closest("button, dialog")) return;
+if (e.target.closest("button, dialog, .mstar, .tooltip")) return; // ignore UI + stars
 
   currentX = e.clientX;
   currentY = e.clientY;
@@ -829,15 +829,23 @@ function openView(id, data) {
       renderStars();
     };
   };
-
-  deleteBtn.onclick = async () => {
-    if (confirm("Are you sure you want to delete this star?")) {
+deleteBtn.onclick = async () => {
+  if (!admin) {
+    alert("You must be signed in as admin to delete.");
+    return;
+  }
+  if (confirm("Are you sure you want to delete this star?")) {
+    try {
       await deleteDoc(doc(db, "messages", id));
+      alert("🌟 Star deleted successfully!");
       viewModal.close();
       renderStars();
+    } catch (err) {
+      alert("❌ Failed to delete: " + err.message);
+      console.error(err);
     }
-  };
-
+  }
+};
   viewModal.showModal();
 }
 
