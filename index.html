@@ -538,6 +538,27 @@ body.placing-star {
                 0 0 35px rgba(125,211,252,0.6);
   }
 }
+/* ✨ Emoji Picker Styling ✨ */
+.emoji-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  font-size: 1.6rem;
+  user-select: none;
+  justify-content: center;
+}
+
+.emoji-picker span,
+.emoji-picker {
+  cursor: pointer;
+}
+
+.emoji-picker .selected {
+  transform: scale(1.25);
+  filter: brightness(1.4);
+  text-shadow: 0 0 12px #fff;
+  transition: transform 0.2s, filter 0.2s, text-shadow 0.3s;
+}
 </style>
 </head>
 <body>
@@ -571,37 +592,11 @@ body.placing-star {
         <label>Message</label>
         <textarea id="msgInput" maxlength="300" required placeholder="Write a sweet note…"></textarea>
       </div>
-      <div class="field">
-  <label>Emojis (choose one or more 💖)</label>
-  <select id="emojiSelect" multiple size="6">
-    <option>🌟</option>
-    <option>🎂</option>
-    <option>🎈</option>
-    <option>💖</option>
-    <option>🥳</option>
-    <option>✨</option>
-    <option>🎶</option>
-    <option>💫</option>
-    <option>❤️</option>
-    <option>🧡</option>
-    <option>💛</option>
-    <option>💚</option>
-    <option>💙</option>
-    <option>💜</option>
-    <option>🤎</option>
-    <option>🖤</option>
-    <option>🤍</option>
-    <option>💗</option>
-    <option>💓</option>
-    <option>💞</option>
-    <option>💕</option>
-    <option>💘</option>
-    <option>💝</option>
-    <option>🌈</option>
-    <option>🌟</option>
-    <option>🎉</option>
-    <option>🥰</option>
-  </select>
+    <div class="field">
+  <label>Choose your emojis 💕 (click one or more)</label>
+  <div id="emojiPicker" class="emoji-picker">
+    🌟 🎂 🎈 💖 🥳 ✨ 🎶 💫 ❤️ 🧡 💛 💚 💙 💜 🤎 🖤 🤍 💗 💓 💞 💕 💘 💝 🌈 🎉 🥰
+  </div>
 </div>
       <div class="row">
         <button type="submit" class="accent">Save Star</button>
