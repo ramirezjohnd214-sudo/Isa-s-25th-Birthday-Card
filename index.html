@@ -470,6 +470,10 @@ box-shadow: 0 0 25px 8px rgba(255,255,255,0.95),
   0% { transform: scale(0.8); opacity: 1; }
   100% { transform: scale(1.3) translate(var(--x), var(--y)); opacity: 0; }
 }
+/* Ensure message stars stay visible above fireworks */
+#message-layer {
+  z-index: 20;
+}
 </style>
 </head>
 <body>
@@ -618,7 +622,7 @@ function createFirework() {
 
  // 🎇 Aim explosions toward the center of the screen
  const centerX = window.innerWidth / 2;
- const peakY = window.innerHeight * (0.35 + Math.random() * 0.1); // middle-top area
+const peakY = window.innerHeight * (0.35 + Math.random() * 0.1);
  // arc slightly toward the center
  const arcX = centerX + (startX - centerX) * 0.3 + (Math.random() - 0.5) * 100;
 
@@ -642,16 +646,15 @@ function createFirework() {
     createExplosion(arcX, peakY, scale);
   };
 }
-
 function createExplosion(x, y, scale = 1) {
   const colors = [
     "#ffd700", "#ff69b4", "#00ffff", "#ffffff",
     "#ffa500", "#adff2f", "#87cefa", "#ffb6c1"
   ];
 
-  const sparks = 35 + Math.floor(Math.random() * 20);
-  const spread = 150 * scale + Math.random() * 120 * scale;
-  const duration = 1800 + Math.random() * 700;
+  const sparks = 60 + Math.floor(Math.random() * 40); // 🌟 more sparks
+  const spread = 200 * scale + Math.random() * 150 * scale; // 🌟 wider spread
+  const duration = 2200 + Math.random() * 1000; // 🌟 linger longer
 
   for (let i = 0; i < sparks; i++) {
     const s = document.createElement("div");
@@ -659,11 +662,12 @@ function createExplosion(x, y, scale = 1) {
     s.style.left = `${x}px`;
     s.style.top = `${y}px`;
     s.style.background = colors[Math.floor(Math.random() * colors.length)];
-    s.style.width = `${2 + Math.random() * 3 * scale}px`;
+    s.style.width = `${2 + Math.random() * 4 * scale}px`;
     s.style.height = s.style.width;
-    s.style.boxShadow = `0 0 ${10 + 10 * scale}px ${s.style.background}`;
+    s.style.boxShadow = `0 0 ${12 + 10 * scale}px ${s.style.background}`;
     s.style.setProperty("--x", `${(Math.random() - 0.5) * spread}px`);
     s.style.setProperty("--y", `${(Math.random() - 0.5) * spread}px`);
+    s.style.opacity = 0.9;
     s.style.animationDuration = `${duration}ms`;
     s.style.animationName = "explode, shimmer";
     s.style.animationTimingFunction = "ease-out, linear";
