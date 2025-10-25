@@ -840,12 +840,13 @@ addBtn.onclick = () => {
 
   const notice = document.getElementById("notice");
   notice.textContent = "Click the sky to place your star ✨";
+  notice.style.display = "block"; // force it visible
   notice.classList.add("show");
 
-  // Optional: auto-hide after 4 seconds if no click
+  // make sure it stays visible at least 3 seconds
   setTimeout(() => {
-    if (isPlacing) notice.classList.remove("show");
-  }, 4000);
+    if (isPlacing) notice.classList.add("show");
+  }, 50);
 };
 
 // === Handle star placement click ===
@@ -854,9 +855,10 @@ document.addEventListener("click", (e) => {
   if (e.target.closest("button, dialog, .mstar, .tooltip")) return; // ignore UI & stars
 
   isPlacing = false;
-  const notice = document.getElementById("notice");
-  notice.classList.remove("show");
-  document.body.classList.remove("placing-star");
+const notice = document.getElementById("notice");
+notice.classList.remove("show");
+notice.style.display = "none";
+document.body.classList.remove("placing-star");
 
   currentX = e.clientX;
   currentY = e.clientY;
