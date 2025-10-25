@@ -498,7 +498,7 @@ box-shadow: 0 0 25px 8px rgba(255,255,255,0.95),
 body.placing-star {
   cursor: url('https://cdn-icons-png.flaticon.com/512/616/616408.png') 16 16, crosshair;
 }
-/* ✨ Floating magical notice message ✨ */
+/* ✨ Floating magical notice ✨ */
 #notice {
   position: fixed;
   top: 1.5rem;
@@ -517,26 +517,14 @@ body.placing-star {
   backdrop-filter: blur(8px);
   box-shadow: 0 0 15px rgba(255,255,255,0.3);
   transition: opacity 0.6s ease, transform 0.6s ease;
-  z-index: 999;
+  z-index: 99999;
 }
-/* fade in/out animation */
+
 #notice.show {
   opacity: 1;
   transform: translateX(-50%) scale(1.05);
-  animation: sparkleNotice 3s infinite ease-in-out alternate;
 }
 
-/* subtle sparkle pulse */
-@keyframes sparkleNotice {
-  0%, 100% {
-    box-shadow: 0 0 10px rgba(255,255,255,0.5),
-                0 0 20px rgba(125,211,252,0.3);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(255,255,255,0.9),
-                0 0 35px rgba(125,211,252,0.6);
-  }
-}
 /* ✨ Emoji Picker Styling ✨ */
 .emoji-picker {
   display: flex;
@@ -545,19 +533,18 @@ body.placing-star {
   font-size: 1.6rem;
   user-select: none;
   justify-content: center;
+  margin-top: 0.5rem;
 }
 
-.emoji-picker span,
-.emoji-picker {
+.emoji-picker span {
   cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
-.emoji-picker .selected {
+.emoji-picker span:hover {
   transform: scale(1.25);
-  filter: brightness(1.4);
-  text-shadow: 0 0 12px #fff;
-  transition: transform 0.2s, filter 0.2s, text-shadow 0.3s;
 }
+
 </style>
 </head>
 <body>
@@ -578,6 +565,25 @@ body.placing-star {
     <span class="muted">Tip: click the sky to place your star</span>
   </div>
 
+<<<<<<< HEAD
+<!-- 🌟 Add Star Modal -->
+<dialog id="addModal">
+  <form id="addForm">
+    <h2>Add Your Star ✨</h2>
+
+    <div class="field">
+      <label>Your Name</label>
+      <input id="nameInput" maxlength="40" required placeholder="Your name" />
+    </div>
+
+    <div class="field">
+      <label>Message</label>
+      <textarea id="msgInput" maxlength="300" required placeholder="Write a sweet note…"></textarea>
+
+      <!-- ✨ Emoji Picker -->
+      <div class="emoji-picker" id="emojiPicker">
+        🌟 🎂 🎈 💖 🥳 ✨ 🎶 💫 ❤️ 🧡 💛 💚 💙 💜 🤎 🖤 🤍 💗 💓 💞 💕 💘 💝 🌈 🎉 🥰
+=======
   <!-- Add Star Modal -->
   <dialog id="addModal">
     <form id="addForm" method="dialog">
@@ -599,9 +605,19 @@ body.placing-star {
       <div class="row">
         <button type="submit" class="accent">Save Star</button>
         <button type="button" id="cancelAdd" class="ghost">Cancel</button>
+>>>>>>> 1e07ded1a499999d384716f0e0e979775acc714e
       </div>
-    </form>
-  </dialog>
+    </div>
+
+    <menu>
+      <button id="cancelAdd" type="button">Cancel</button>
+      <button id="saveStar" type="submit" class="accent">Save Star</button>
+    </menu>
+  </form>
+</dialog>
+
+<!-- ✨ Notice message -->
+<div id="notice">Click the sky to place your star ✨</div>
 
   <!-- View/Edit Modal -->
   <dialog id="viewModal" class="message-modal">
@@ -798,33 +814,31 @@ const viewModal = document.getElementById("viewModal");
 const viewContent = document.getElementById("viewContent");
 const addBtn = document.getElementById("addBtn");
 const cancelAdd = document.getElementById("cancelAdd");
-// ✅ Restrict Name field to letters and spaces only
+/* === Name validation: letters only === */
 const nameInput = document.getElementById("nameInput");
 nameInput.addEventListener("input", () => {
   nameInput.value = nameInput.value.replace(/[^a-zA-Z\s]/g, "");
 });
-// 🎨 Emoji Picker Logic
-const emojiPicker = document.getElementById("emojiPicker");
-let selectedEmojis = [];
 
-// Split emojis into clickable spans
-emojiPicker.innerHTML = emojiPicker.textContent
-  .trim()
-  .split(/\s+/)
-  .map(e => `<span>${e}</span>`)
-  .join(" ");
+/* === Emoji Picker Logic === */
+const emojiPicker = document.getElementById("emojiPicker");
+const msgInput = document.getElementById("msgInput");
 
 emojiPicker.addEventListener("click", (e) => {
-  if (e.target.tagName !== "SPAN") return;
-  const emoji = e.target.textContent;
-
-  if (selectedEmojis.includes(emoji)) {
-    selectedEmojis = selectedEmojis.filter(e => e !== emoji);
-    e.target.classList.remove("selected");
-  } else {
-    selectedEmojis.push(emoji);
-    e.target.classList.add("selected");
+  if (e.target.tagName === "SPAN") {
+    const emoji = e.target.textContent;
+    const start = msgInput.selectionStart;
+    const end = msgInput.selectionEnd;
+    msgInput.value =
+      msgInput.value.substring(0, start) + emoji + msgInput.value.substring(end);
+    msgInput.focus();
+    msgInput.selectionEnd = start + emoji.length;
   }
+});
+// ✅ Restrict Name field to letters and spaces only
+const nameInput = document.getElementById("nameInput");
+nameInput.addEventListener("input", () => {
+  nameInput.value = nameInput.value.replace(/[^a-zA-Z\s]/g, "");
 });
 // Allow user to click anywhere in the sky to choose star position
 let currentX = 0, currentY = 0;
