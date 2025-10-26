@@ -588,6 +588,111 @@ body.placing-star {
                0 0 16px rgba(255, 192, 203, 0.6),
                0 0 24px rgba(255, 105, 180, 0.4);
 }
+/* 💫 Magical Add Star Modal Styling */
+#addModal {
+  background: rgba(25, 25, 55, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  padding: 2rem 2.5rem;
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 0 20px rgba(255, 255, 255, 0.2),
+    0 0 60px rgba(125, 211, 252, 0.15),
+    inset 0 0 10px rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-family: "Quicksand", sans-serif;
+  animation: modalAppear 0.6s ease;
+}
+
+@keyframes modalAppear {
+  from { opacity: 0; transform: scale(0.8) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+#addModal h2 {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #fff;
+  text-shadow: 0 0 12px #fff, 0 0 25px #7dd3fc;
+  margin-bottom: 1rem;
+}
+
+/* Input & textarea glowing look */
+#addModal input,
+#addModal textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+#addModal input:focus,
+#addModal textarea:focus {
+  outline: none;
+  border-color: #7dd3fc;
+  box-shadow: 0 0 12px #7dd3fc, 0 0 20px #fff;
+}
+
+/* Buttons with starry glow */
+#addModal button {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #ff9ff3, #7dd3fc, #a78bfa);
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+  transition: transform 0.25s ease, box-shadow 0.3s ease;
+}
+
+#addModal button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.6),
+              0 0 40px rgba(125, 211, 252, 0.5);
+}
+
+/* Emoji picker fits the magic theme */
+.emoji-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  font-size: 1.6rem;
+  padding-top: 0.6rem;
+}
+
+.emoji-picker span {
+  cursor: pointer;
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.emoji-picker span:hover {
+  transform: scale(1.25);
+  filter: brightness(1.4);
+}
+#addModal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.15), transparent 60%),
+              radial-gradient(circle at 80% 70%, rgba(125,211,252,0.1), transparent 60%);
+  animation: shimmerFlow 6s infinite ease-in-out alternate;
+  z-index: -1;
+}
+
+@keyframes shimmerFlow {
+  0% { opacity: 0.3; transform: scale(1); }
+  100% { opacity: 0.7; transform: scale(1.1); }
+}
+
 </style>
 </head>
 <body>
