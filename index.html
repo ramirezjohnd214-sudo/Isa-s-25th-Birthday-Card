@@ -494,6 +494,28 @@ box-shadow: 0 0 25px 8px rgba(255,255,255,0.95),
   50%  { opacity: 0.5; transform: scale(0.8); }
   100% { opacity: 0; transform: scale(0.5); }
 }
+/* 🌠 Magical sparkle trail behind fireworks */
+.spark-trail {
+  position: fixed;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, #ffb6c1 60%, transparent 100%);
+  pointer-events: none;
+  opacity: 0.9;
+  box-shadow:
+    0 0 6px rgba(255, 255, 255, 0.8),
+    0 0 12px rgba(255, 182, 193, 0.7),
+    0 0 20px rgba(255, 215, 0, 0.6);
+  animation: fadeTrail 0.8s ease-out forwards;
+  mix-blend-mode: screen;
+}
+
+@keyframes fadeTrail {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.6); }
+}
+
 /* ✨ Magical star cursor when placing a star */
 body.placing-star {
   cursor: url('https://cdn-icons-png.flaticon.com/512/616/616408.png') 16 16, crosshair;
