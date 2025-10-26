@@ -750,35 +750,6 @@ body.placing-star {
   }
 }
 
-/* 💥 Explosion Particles */
-.particle {
-  position: fixed;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff 0%, #ffd6b0 50%, transparent 100%);
-  opacity: 0.95;
-  pointer-events: none;
-  mix-blend-mode: screen;
-  animation: explode 1.4s ease-out forwards;
-  z-index: 10;
-  box-shadow:
-    0 0 10px rgba(255, 255, 255, 0.9),
-    0 0 20px rgba(255, 200, 200, 0.7),
-    0 0 40px rgba(255, 215, 0, 0.4);
-}
-
-@keyframes explode {
-  0% {
-    transform: translate(0, 0);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(var(--dx), var(--dy));
-    opacity: 0;
-  }
-}
-
 /* 🌠 Magical Spark Trail */
 .spark-trail {
   position: fixed;
