@@ -35,6 +35,33 @@
   object-fit:contain;     /* shows the entire 1536x1024 image */
   image-rendering:auto;
 }
+/* 🌅 Smooth fade-in for background images */
+.bg-fill,
+.bg-img {
+  opacity: 0;
+  animation: fadeInImage 2.8s ease-out forwards;
+}
+
+@keyframes fadeInImage {
+  0% { opacity: 0; transform: scale(1.05); }
+  50% { opacity: 0.6; transform: scale(1.02); }
+  100% { opacity: 1; transform: scale(1); }
+}
+/* ✨ Gentle shimmer as background fades in */
+.bg-img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.05), transparent 70%),
+              radial-gradient(circle at 70% 60%, rgba(125,211,252,0.05), transparent 70%);
+  animation: bgShimmer 6s ease-in-out infinite alternate;
+}
+
+@keyframes bgShimmer {
+  0% { opacity: 0.3; }
+  100% { opacity: 0.7; }
+}
+
   /* CANVAS STARS */
   #star-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
   /* INTERACTIVE STAR LAYER (DOM) */
