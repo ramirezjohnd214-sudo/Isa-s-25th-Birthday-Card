@@ -464,6 +464,9 @@ box-shadow: 0 0 25px 8px rgba(255,255,255,0.95),
   animation: explode 1.8s ease-out forwards;
   mix-blend-mode: screen;
   z-index: 10;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.8),
+              0 0 25px rgba(255, 192, 203, 0.6),
+              0 0 45px rgba(255, 215, 0, 0.4);
 }
 
 @keyframes explode {
@@ -697,26 +700,48 @@ body.placing-star {
 function createFirework() {
   const fw = document.createElement("div");
   fw.className = "firework";
+
+  const depth = Math.random();
+  let scale, opacity, heightMult;
+  if (depth < 0.3) { scale = 0.4; opacity = 0.6; heightMult = 0.7; }
+  else if (depth < 0.7) { scale = 0.7; opacity = 0.8; heightMult = 0.85; }
+  else { scale = 1.0; opacity = 1.0; heightMult = 1.0; }
+
   const startX = Math.random() * window.innerWidth;
-  const startY = window.innerHeight * 0.6;
+  const startY = window.innerHeight * 0.55;
   const centerX = window.innerWidth / 2;
   const peakY = window.innerHeight * (0.3 + Math.random() * 0.1);
   const arcX = centerX + (startX - centerX) * 0.3 + (Math.random() - 0.5) * 100;
 
   fw.style.left = `${startX}px`;
   fw.style.bottom = `${startY}px`;
+  fw.style.transform = `scale(${scale})`;
+  fw.style.opacity = opacity;
   document.body.appendChild(fw);
 
+  // 🌟 Launch trail sparkle generator
+  const trailInterval = setInterval(() => {
+    const rect = fw.getBoundingClientRect();
+    const trail = document.createElement("div");
+    trail.className = "spark-trail";
+    trail.style.left = `${rect.left + 2}px`;
+    trail.style.top = `${rect.top + 2}px`;
+    document.body.appendChild(trail);
+    setTimeout(() => trail.remove(), 800);
+  }, 50);
+
+  // ✨ Animate curved trajectory
   fw.animate(
     [
-      { transform: `translate(0,0)`, opacity: 1 },
-      { transform: `translate(${(arcX - startX) * 0.5}px, -${(startY - peakY) / 2}px)`, opacity: 1 },
-      { transform: `translate(${arcX - startX}px, -${startY - peakY}px)`, opacity: 0.7 }
+      { transform: `translate(0, 0) scale(${scale})`, opacity: 1 },
+      { transform: `translate(${(arcX - startX) * 0.5}px, -${(startY - peakY) / 2}px) scale(${scale * 1.1})`, opacity: 1 },
+      { transform: `translate(${arcX - startX}px, -${startY - peakY}px) scale(${scale * 0.8})`, opacity: 0.6 }
     ],
-    { duration: 1800, easing: "ease-out" }
+    { duration: 2000, easing: "ease-out" }
   ).onfinish = () => {
+    clearInterval(trailInterval);
     fw.remove();
-    createExplosion(arcX, peakY);
+    createExplosion(arcX, peakY, scale);
   };
 }
 
