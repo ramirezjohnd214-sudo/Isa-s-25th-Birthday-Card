@@ -772,6 +772,7 @@ body.placing-star {
   0% { opacity: 1; transform: scale(1); }
   100% { opacity: 0; transform: scale(0.6); }
 }
+
 /* === 💙 Heart Firework (every 30 seconds) === */
 function launchHeartFirework() {
   const x = window.innerWidth / 2 + (Math.random() - 0.5) * 300; // random near center
@@ -811,7 +812,7 @@ function launchHeartFirework() {
 }
 
 // 🎇 Launch the blue heart firework every 30 seconds
-setInterval(launchHeartFirework, 30000);
+setInterval(launchHeartFirework, 10000);
 
 </style>
 </head>
