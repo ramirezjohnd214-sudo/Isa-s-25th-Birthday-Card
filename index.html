@@ -772,6 +772,56 @@ body.placing-star {
   0% { opacity: 1; transform: scale(1); }
   100% { opacity: 0; transform: scale(0.6); }
 }
+/* === 💙 Heart Firework (every 30 seconds) === */
+function launchHeartFirework() {
+  const x = window.innerWidth / 2 + (Math.random() - 0.5) * 300; // random near center
+  const y = window.innerHeight * 0.6;
+
+  const count = 40;
+  const heartPoints = [];
+
+  // ❤️ Generate coordinates for a heart shape (parametric)
+  for (let i = 0; i < count; i++) {
+    const t = (Math.PI * 2 * i) / count;
+    const dx = 16 * Math.pow(Math.sin(t), 3);
+    const dy =
+      13 * Math.cos(t) -
+      5 * Math.cos(2 * t) -
+      2 * Math.cos(3 * t) -
+      Math.cos(4 * t);
+    heartPoints.push({ dx, dy });
+  }
+
+  // 💙 Create particles in a heart pattern
+  heartPoints.forEach((pt) => {
+    const p = document.createElement("div");
+    p.className = "particle heart";
+    p.style.background = "radial-gradient(circle, #a2d2ff 0%, #0077ff 60%, transparent 100%)";
+    p.style.left = `${x}px`;
+    p.style.top = `${y}px`;
+
+    // scale and flip Y to orient upright
+    const scale = 6;
+    p.style.setProperty("--dx", `${pt.dx * scale}px`);
+    p.style.setProperty("--dy", `${-pt.dy * scale}px`);
+    document.body.appendChild(p);
+
+    setTimeout(() => p.remove(), 2500);
+  });
+}
+
+// 🎇 Launch the blue heart firework every 30 seconds
+setInterval(launchHeartFirework, 30000);
+
+/* 💙 Blue Heart Firework Glow */
+.particle.heart {
+  box-shadow:
+    0 0 12px rgba(173, 216, 255, 0.9),
+    0 0 28px rgba(100, 180, 255, 0.6),
+    0 0 40px rgba(0, 120, 255, 0.4);
+  animation-duration: 2.4s;
+}
+
 </style>
 </head>
 <body>
