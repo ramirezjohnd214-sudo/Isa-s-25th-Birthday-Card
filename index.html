@@ -892,26 +892,25 @@ function createFirework() {
   const fw = document.createElement("div");
   fw.className = "firework";
 
-  // Random scale and brightness depth
   const depth = Math.random();
-  let scale, opacity;
-  if (depth < 0.3) { scale = 0.4; opacity = 0.6; }
-  else if (depth < 0.7) { scale = 0.7; opacity = 0.8; }
-  else { scale = 1.0; opacity = 1.0; }
+  let scale, opacity, heightMult;
+  if (depth < 0.3) { scale = 0.4; opacity = 0.6; heightMult = 0.7; }
+  else if (depth < 0.7) { scale = 0.7; opacity = 0.8; heightMult = 0.85; }
+  else { scale = 1.0; opacity = 1.0; heightMult = 1.0; }
 
-  // --- Starting and ending coordinates ---
   const startX = Math.random() * window.innerWidth;
-  const startY = window.innerHeight * 0.85;  // near bottom of screen
-  const endY = window.innerHeight * 0.35;    // mid-sky burst height
-  const arcX = startX + (Math.random() - 0.5) * 200; // small horizontal arc
+  const startY = window.innerHeight * 0.55;
+  const centerX = window.innerWidth / 2;
+  const peakY = window.innerHeight * (0.3 + Math.random() * 0.1);
+  const arcX = centerX + (startX - centerX) * 0.3 + (Math.random() - 0.5) * 100;
 
   fw.style.left = `${startX}px`;
-  fw.style.top = `${startY}px`; // use TOP instead of bottom!
+  fw.style.bottom = `${startY}px`;
   fw.style.transform = `scale(${scale})`;
   fw.style.opacity = opacity;
   document.body.appendChild(fw);
 
-  // 🌟 Sparkle trail
+  // 🌟 Launch trail sparkle generator
   const trailInterval = setInterval(() => {
     const rect = fw.getBoundingClientRect();
     const trail = document.createElement("div");
@@ -922,29 +921,43 @@ function createFirework() {
     setTimeout(() => trail.remove(), 800);
   }, 50);
 
-  // --- Animate upward arc ---
-  const distanceY = endY - startY; // negative = upward
-  const duration = 1800 + Math.random() * 400;
-
-  const animation = fw.animate(
+  // ✨ Animate curved trajectory
+  fw.animate(
     [
       { transform: `translate(0, 0) scale(${scale})`, opacity: 1 },
-      { transform: `translate(${(arcX - startX) * 0.4}px, ${distanceY * 0.6}px) scale(${scale * 1.1})`, opacity: 1 },
-      { transform: `translate(${arcX - startX}px, ${distanceY}px) scale(${scale * 0.8})`, opacity: 0.8 }
+      { transform: `translate(${(arcX - startX) * 0.5}px, -${(startY - peakY) / 2}px) scale(${scale * 1.1})`, opacity: 1 },
+      { transform: `translate(${arcX - startX}px, -${startY - peakY}px) scale(${scale * 0.8})`, opacity: 0.6 }
     ],
-    { duration, easing: "ease-out", fill: "forwards" }
-  );
-
-  animation.onfinish = () => {
+    { duration: 2000, easing: "ease-out" }
+  ).onfinish = () => {
     clearInterval(trailInterval);
-    const rect = fw.getBoundingClientRect();
-    const endX = rect.left + rect.width / 2;
-    const endY = rect.top + rect.height / 2; // top-based coordinate
     fw.remove();
-
-    createExplosion(endX, endY, scale);
+    createExplosion(arcX, peakY, scale);
   };
 }
+
+function createExplosion(x, y) {
+  const colors = ["#ffd700", "#ff69b4", "#00ffff", "#ffffff", "#ffa500", "#adff2f", "#87cefa", "#ffb6c1"];
+  const sparks = 60 + Math.random() * 40;
+  const spread = 200 + Math.random() * 100;
+  const duration = 2200 + Math.random() * 800;
+
+  for (let i = 0; i < sparks; i++) {
+    const s = document.createElement("div");
+    s.className = "explosion";
+    s.style.left = `${x}px`;
+    s.style.top = `${y}px`;
+    s.style.background = colors[Math.floor(Math.random() * colors.length)];
+    s.style.width = s.style.height = `${3 + Math.random() * 3}px`;
+    s.style.setProperty("--x", `${(Math.random() - 0.5) * spread}px`);
+    s.style.setProperty("--y", `${(Math.random() - 0.5) * spread}px`);
+    s.style.animationDuration = `${duration}ms`;
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), duration);
+  }
+}
+// 🎇 Launch every 3 seconds
+setInterval(createFirework, 3000);
 
 /* === Firebase Setup === */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
