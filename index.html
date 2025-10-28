@@ -887,23 +887,22 @@ body.placing-star {
 
   <!-- Firebase (modular v10) -->
 <script type="module">
-  
-/* === Fireworks Background === */
+
 function createFirework() {
   const fw = document.createElement("div");
   fw.className = "firework";
 
   const depth = Math.random();
-  let scale, opacity, heightMult;
-  if (depth < 0.3) { scale = 0.4; opacity = 0.6; heightMult = 0.7; }
-  else if (depth < 0.7) { scale = 0.7; opacity = 0.8; heightMult = 0.85; }
-  else { scale = 1.0; opacity = 1.0; heightMult = 1.0; }
+  let scale, opacity;
+  if (depth < 0.3) { scale = 0.4; opacity = 0.6; }
+  else if (depth < 0.7) { scale = 0.7; opacity = 0.8; }
+  else { scale = 1.0; opacity = 1.0; }
 
+  // --- Starting & ending coordinates ---
   const startX = Math.random() * window.innerWidth;
-  const startY = window.innerHeight * 0.55;
-  const centerX = window.innerWidth / 2;
-  const peakY = window.innerHeight * (0.3 + Math.random() * 0.1);
-  const arcX = centerX + (startX - centerX) * 0.3 + (Math.random() - 0.5) * 100;
+  const startY = window.innerHeight * 0.05;  // start near bottom
+  const endY = window.innerHeight * (0.6 + Math.random() * 0.15); // top region
+  const arcX = startX + (Math.random() - 0.5) * 200; // slight horizontal curve
 
   fw.style.left = `${startX}px`;
   fw.style.bottom = `${startY}px`;
@@ -922,34 +921,37 @@ function createFirework() {
     setTimeout(() => trail.remove(), 800);
   }, 50);
 
-  // ✨ Animate curved trajectory with precise endpoint tracking
+  // --- Animate straight upward arc ---
+  const distanceY = endY - startY;
+  const duration = 1800 + Math.random() * 400;
+
   const animation = fw.animate(
     [
       { transform: `translate(0, 0) scale(${scale})`, opacity: 1 },
-      { transform: `translate(${(arcX - startX) * 0.5}px, -${(startY - peakY) / 2}px) scale(${scale * 1.1})`, opacity: 1 },
-      { transform: `translate(${arcX - startX}px, -${startY - peakY}px) scale(${scale * 0.8})`, opacity: 0.6 }
+      { transform: `translate(${(arcX - startX) * 0.4}px, ${distanceY * 0.6}px) scale(${scale * 1.1})`, opacity: 1 },
+      { transform: `translate(${arcX - startX}px, ${distanceY}px) scale(${scale * 0.8})`, opacity: 0.8 }
     ],
-    { duration: 2000, easing: "ease-out" }
+    { duration, easing: "ease-out", fill: "forwards" }
   );
 
   animation.onfinish = () => {
     clearInterval(trailInterval);
 
-    // ✅ Compute exact end position from getBoundingClientRect()
+    // ✅ Compute exact end of the rocket relative to bottom of window
     const rect = fw.getBoundingClientRect();
     const endX = rect.left + rect.width / 2;
-    const endY = rect.top + rect.height / 2;
-
+    const endY = rect.bottom; // use bottom instead of top
     fw.remove();
+
     createExplosion(endX, endY, scale);
   };
 }
 
-function createExplosion(x, y) {
+function createExplosion(x, y, scale) {
   const colors = ["#ffd700", "#ff69b4", "#00ffff", "#ffffff", "#ffa500", "#adff2f", "#87cefa", "#ffb6c1"];
   const sparks = 60 + Math.random() * 40;
-  const spread = 200 + Math.random() * 100;
-  const duration = 2200 + Math.random() * 800;
+  const spread = 200 * scale;
+  const duration = 2000 + Math.random() * 800;
 
   for (let i = 0; i < sparks; i++) {
     const s = document.createElement("div");
@@ -965,7 +967,7 @@ function createExplosion(x, y) {
     setTimeout(() => s.remove(), duration);
   }
 }
-// 🎇 Launch every 3 seconds
+
 setInterval(createFirework, 3000);
 
 /* === Firebase Setup === */
