@@ -773,6 +773,31 @@ body.placing-star {
   100% { opacity: 0; transform: scale(0.6); }
 }
 
+  /* 💖 Hello Kitty sparkle effect */
+  .explosion[style*="ffb6c1"] {
+    filter: drop-shadow(0 0 10px #ffb6c1) brightness(1.4);
+  }
+  .explosion[style*="ff4d6d"] {
+    filter: drop-shadow(0 0 8px #ff4d6d) brightness(1.3);
+  }
+  
+  /* 🎀 Hello Kitty bow twinkle animation */
+@keyframes kittyTwinkle {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px #ff4d6d) brightness(1.2);
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 16px #ff7fa2) brightness(1.6);
+    transform: scale(1.2);
+  }
+}
+
+/* Apply twinkle to Hello Kitty bow sparkles */
+.explosion[style*="ff4d6d"] {
+  animation: sparkleFade 2.4s ease-out forwards, kittyTwinkle 1.2s ease-in-out infinite;
+}
+
 </style>
 </head>
 <body>
@@ -950,13 +975,15 @@ let lastHeartTime = 0;
 
 function createExplosion(x, y) {
   const now = Date.now();
-  const isHeart = now - lastHeartTime > 30000; // every 30 seconds
-
-  if (isHeart) {
-    lastHeartTime = now;
+if (now - lastHeartTime > 30000) {
+  lastHeartTime = now;
+  if (Math.random() < 0.5) {
     createHeartExplosion(x, y);
-    return;
+  } else {
+    createHelloKittyExplosion(x, y);
   }
+  return;
+}
 
   // 🎇 Regular fireworks
   const colors = ["#ffd700", "#ff69b4", "#00ffff", "#ffffff", "#ffa500", "#adff2f", "#87cefa", "#ffb6c1"];
@@ -1000,6 +1027,47 @@ function createHeartExplosion(x, y) {
     document.body.appendChild(s);
     setTimeout(() => s.remove(), duration);
   }
+}
+function createHelloKittyExplosion(x, y) {
+  const colorMain = "#ffb6c1"; // pink glow
+  const colorBow = "#ff4d6d";  // darker pink for bow
+  const duration = 2800;
+
+  // 🐱 Simplified head + bow outline coordinates
+  const kittyPoints = [
+    // head (circle-ish)
+    ...Array.from({ length: 40 }, (_, i) => {
+      const angle = (i / 40) * 2 * Math.PI;
+      return {
+        x: 16 * Math.cos(angle),
+        y: 14 * Math.sin(angle)
+      };
+    }),
+    // left ear
+    { x: -10, y: -14 }, { x: -14, y: -8 }, { x: -8, y: -6 },
+    // right ear
+    { x: 10, y: -14 }, { x: 14, y: -8 }, { x: 8, y: -6 },
+    // bow (cluster on right ear)
+    { x: 10, y: -10, bow: true },
+    { x: 12, y: -12, bow: true },
+    { x: 14, y: -10, bow: true },
+    { x: 12, y: -8, bow: true }
+  ];
+
+  // create spark particles
+  kittyPoints.forEach((p) => {
+    const s = document.createElement("div");
+    s.className = "explosion";
+    s.style.left = `${x}px`;
+    s.style.top = `${y}px`;
+    s.style.background = p.bow ? colorBow : colorMain;
+    s.style.width = s.style.height = `${4 + Math.random() * 2}px`;
+    s.style.setProperty("--x", `${p.x * 8}px`);
+    s.style.setProperty("--y", `${p.y * 8}px`);
+    s.style.animationDuration = `${duration}ms`;
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), duration);
+  });
 }
 
 setInterval(createFirework, 3000);
