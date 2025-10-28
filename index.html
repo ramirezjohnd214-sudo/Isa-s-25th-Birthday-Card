@@ -931,14 +931,8 @@ function createFirework() {
     { duration: 2000, easing: "ease-out" }
   ).onfinish = () => {
   clearInterval(trailInterval);
-
-  // ✅ Get the firework’s final on-screen position
-  const rect = fw.getBoundingClientRect();
-  const endX = rect.left + rect.width / 2;
-  const endY = rect.top + rect.height / 2;
-
   fw.remove();
-  createExplosion(endX, endY, scale);
+  createExplosion(arcX, peakY, scale);
 };
 }
 
