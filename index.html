@@ -780,7 +780,7 @@ body.placing-star {
   .explosion[style*="ff4d6d"] {
     filter: drop-shadow(0 0 8px #ff4d6d) brightness(1.3);
   }
-  
+
   /* 🎀 Hello Kitty bow twinkle animation */
 @keyframes kittyTwinkle {
   0%, 100% {
@@ -796,6 +796,13 @@ body.placing-star {
 /* Apply twinkle to Hello Kitty bow sparkles */
 .explosion[style*="ff4d6d"] {
   animation: sparkleFade 2.4s ease-out forwards, kittyTwinkle 1.2s ease-in-out infinite;
+}
+/* 🐱 Boost Hello Kitty visibility */
+.explosion[style*="ffd6ec"] {
+  filter: drop-shadow(0 0 15px #ffd6ec) brightness(1.6);
+}
+.explosion[style*="ff4d6d"] {
+  filter: drop-shadow(0 0 10px #ff4d6d) brightness(1.5);
 }
 
 </style>
@@ -1029,32 +1036,33 @@ function createHeartExplosion(x, y) {
   }
 }
 function createHelloKittyExplosion(x, y) {
-  const colorMain = "#ffb6c1"; // pink glow
-  const colorBow = "#ff4d6d";  // darker pink for bow
+  const colorMain = "#ffd6ec"; // pastel pink-white glow
+  const colorBow = "#ff4d6d";  // bright bow
   const duration = 2800;
 
-  // 🐱 Simplified head + bow outline coordinates
-  const kittyPoints = [
-    // head (circle-ish)
-    ...Array.from({ length: 40 }, (_, i) => {
-      const angle = (i / 40) * 2 * Math.PI;
-      return {
-        x: 16 * Math.cos(angle),
-        y: 14 * Math.sin(angle)
-      };
-    }),
-    // left ear
-    { x: -10, y: -14 }, { x: -14, y: -8 }, { x: -8, y: -6 },
-    // right ear
-    { x: 10, y: -14 }, { x: 14, y: -8 }, { x: 8, y: -6 },
-    // bow (cluster on right ear)
-    { x: 10, y: -10, bow: true },
-    { x: 12, y: -12, bow: true },
-    { x: 14, y: -10, bow: true },
-    { x: 12, y: -8, bow: true }
-  ];
+  // 🎀 Kitty-shaped outline (refined)
+  const kittyPoints = [];
 
-  // create spark particles
+  // Head outline — smoother ellipse (more points)
+  for (let i = 0; i < 60; i++) {
+    const angle = (i / 60) * 2 * Math.PI;
+    const radiusX = 18;
+    const radiusY = 15;
+    kittyPoints.push({ x: Math.cos(angle) * radiusX, y: Math.sin(angle) * radiusY });
+  }
+
+  // Ears
+  kittyPoints.push({ x: -14, y: -16 }, { x: -10, y: -10 }, { x: -6, y: -16 });
+  kittyPoints.push({ x: 14, y: -16 }, { x: 10, y: -10 }, { x: 6, y: -16 });
+
+  // Bow on right ear (cluster)
+  kittyPoints.push(
+    { x: 10, y: -14, bow: true },
+    { x: 12, y: -16, bow: true },
+    { x: 14, y: -14, bow: true },
+    { x: 12, y: -12, bow: true }
+  );
+
   kittyPoints.forEach((p) => {
     const s = document.createElement("div");
     s.className = "explosion";
