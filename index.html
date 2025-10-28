@@ -946,7 +946,19 @@ function createFirework() {
   };
 }
 
+let lastHeartTime = 0;
+
 function createExplosion(x, y) {
+  const now = Date.now();
+  const isHeart = now - lastHeartTime > 30000; // every 30 seconds
+
+  if (isHeart) {
+    lastHeartTime = now;
+    createHeartExplosion(x, y);
+    return;
+  }
+
+  // 🎇 Regular fireworks
   const colors = ["#ffd700", "#ff69b4", "#00ffff", "#ffffff", "#ffa500", "#adff2f", "#87cefa", "#ffb6c1"];
   const sparks = 60 + Math.random() * 40;
   const spread = 200 + Math.random() * 100;
@@ -961,6 +973,29 @@ function createExplosion(x, y) {
     s.style.width = s.style.height = `${3 + Math.random() * 3}px`;
     s.style.setProperty("--x", `${(Math.random() - 0.5) * spread}px`);
     s.style.setProperty("--y", `${(Math.random() - 0.5) * spread}px`);
+    s.style.animationDuration = `${duration}ms`;
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), duration);
+  }
+}
+function createHeartExplosion(x, y) {
+  const color = "#66ccff"; // soft blue 💙
+  const size = 6;
+  const duration = 2600;
+
+  // heart shape equation: (x² + y² - 1)³ - x²y³ = 0
+  for (let t = 0; t < Math.PI * 2; t += 0.1) {
+    const hx = 16 * Math.pow(Math.sin(t), 3);
+    const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+
+    const s = document.createElement("div");
+    s.className = "explosion";
+    s.style.left = `${x}px`;
+    s.style.top = `${y}px`;
+    s.style.background = color;
+    s.style.width = s.style.height = `${size}px`;
+    s.style.setProperty("--x", `${hx * 8}px`);
+    s.style.setProperty("--y", `${hy * 8}px`);
     s.style.animationDuration = `${duration}ms`;
     document.body.appendChild(s);
     setTimeout(() => s.remove(), duration);
