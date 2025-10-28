@@ -887,6 +887,7 @@ body.placing-star {
 
   <!-- Firebase (modular v10) -->
 <script type="module">
+  
 /* === Fireworks Background === */
 function createFirework() {
   const fw = document.createElement("div");
@@ -910,7 +911,7 @@ function createFirework() {
   fw.style.opacity = opacity;
   document.body.appendChild(fw);
 
-  // 🌟 Launch trail sparkle generator
+  // 🌟 Sparkle trail
   const trailInterval = setInterval(() => {
     const rect = fw.getBoundingClientRect();
     const trail = document.createElement("div");
@@ -921,18 +922,26 @@ function createFirework() {
     setTimeout(() => trail.remove(), 800);
   }, 50);
 
-  // ✨ Animate curved trajectory
-  fw.animate(
+  // ✨ Animate curved trajectory with precise endpoint tracking
+  const animation = fw.animate(
     [
       { transform: `translate(0, 0) scale(${scale})`, opacity: 1 },
       { transform: `translate(${(arcX - startX) * 0.5}px, -${(startY - peakY) / 2}px) scale(${scale * 1.1})`, opacity: 1 },
       { transform: `translate(${arcX - startX}px, -${startY - peakY}px) scale(${scale * 0.8})`, opacity: 0.6 }
     ],
     { duration: 2000, easing: "ease-out" }
-  ).onfinish = () => {
+  );
+
+  animation.onfinish = () => {
     clearInterval(trailInterval);
+
+    // ✅ Compute exact end position from getBoundingClientRect()
+    const rect = fw.getBoundingClientRect();
+    const endX = rect.left + rect.width / 2;
+    const endY = rect.top + rect.height / 2;
+
     fw.remove();
-    createExplosion(arcX, peakY, scale);
+    createExplosion(endX, endY, scale);
   };
 }
 
@@ -956,6 +965,7 @@ function createExplosion(x, y) {
     setTimeout(() => s.remove(), duration);
   }
 }
+// 🎇 Launch every 3 seconds
 setInterval(createFirework, 3000);
 
 /* === Firebase Setup === */
