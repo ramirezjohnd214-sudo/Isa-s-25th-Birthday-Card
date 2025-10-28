@@ -901,7 +901,7 @@ function createFirework() {
   const startX = Math.random() * window.innerWidth;
   const startY = window.innerHeight * 0.55;
   const centerX = window.innerWidth / 2;
-  const peakY = window.innerHeight * (0.22 + Math.random() * 0.05);
+  const peakY = window.innerHeight * (0.3 + Math.random() * 0.1);
   const arcX = centerX + (startX - centerX) * 0.3 + (Math.random() - 0.5) * 100;
 
   fw.style.left = `${startX}px`;
@@ -910,7 +910,7 @@ function createFirework() {
   fw.style.opacity = opacity;
   document.body.appendChild(fw);
 
-  // 🌟 Launch trail sparkle generator
+  // ✨ Create trail sparkles
   const trailInterval = setInterval(() => {
     const rect = fw.getBoundingClientRect();
     const trail = document.createElement("div");
@@ -921,19 +921,29 @@ function createFirework() {
     setTimeout(() => trail.remove(), 800);
   }, 50);
 
-  // ✨ Animate curved trajectory
-  fw.animate(
+  // 🎇 Animate curved trajectory
+  const animation = fw.animate(
     [
       { transform: `translate(0, 0) scale(${scale})`, opacity: 1 },
       { transform: `translate(${(arcX - startX) * 0.5}px, -${(startY - peakY) / 2}px) scale(${scale * 1.1})`, opacity: 1 },
       { transform: `translate(${arcX - startX}px, -${startY - peakY}px) scale(${scale * 0.8})`, opacity: 0.6 }
     ],
-    { duration: 2000, easing: "ease-out" }
-  ).onfinish = () => {
-  clearInterval(trailInterval);
-  fw.remove();
-  createExplosion(arcX, peakY, scale);
-};
+    { duration: 2000, easing: "ease-out", fill: "forwards" }
+  );
+
+  animation.onfinish = () => {
+    clearInterval(trailInterval);
+
+    // ✅ Calculate actual end position from the animation
+    const rect = fw.getBoundingClientRect();
+    const endX = rect.left + rect.width / 2;
+    const endY = rect.top + rect.height / 2;
+
+    fw.remove();
+
+    // ✨ Adjust for better alignment (slightly higher)
+    createExplosion(endX, endY - 80 * scale, scale);
+  };
 }
 
 function createExplosion(x, y) {
@@ -956,7 +966,7 @@ function createExplosion(x, y) {
     setTimeout(() => s.remove(), duration);
   }
 }
-// 🎇 Launch every 3 seconds
+
 setInterval(createFirework, 3000);
 
 /* === Firebase Setup === */
