@@ -892,20 +892,21 @@ function createFirework() {
   const fw = document.createElement("div");
   fw.className = "firework";
 
+  // Random scale and brightness depth
   const depth = Math.random();
   let scale, opacity;
   if (depth < 0.3) { scale = 0.4; opacity = 0.6; }
   else if (depth < 0.7) { scale = 0.7; opacity = 0.8; }
   else { scale = 1.0; opacity = 1.0; }
 
-  // --- Starting & ending coordinates ---
+  // --- Starting and ending coordinates ---
   const startX = Math.random() * window.innerWidth;
-  const startY = window.innerHeight * 0.05;  // start near bottom
-  const endY = window.innerHeight * (0.6 + Math.random() * 0.15); // top region
-  const arcX = startX + (Math.random() - 0.5) * 300; // slight horizontal curve
+  const startY = window.innerHeight * 0.85;  // near bottom of screen
+  const endY = window.innerHeight * 0.35;    // mid-sky burst height
+  const arcX = startX + (Math.random() - 0.5) * 200; // small horizontal arc
 
   fw.style.left = `${startX}px`;
-  fw.style.bottom = `${startY}px`;
+  fw.style.top = `${startY}px`; // use TOP instead of bottom!
   fw.style.transform = `scale(${scale})`;
   fw.style.opacity = opacity;
   document.body.appendChild(fw);
@@ -921,8 +922,8 @@ function createFirework() {
     setTimeout(() => trail.remove(), 800);
   }, 50);
 
-  // --- Animate straight upward arc ---
-  const distanceY = endY - startY;
+  // --- Animate upward arc ---
+  const distanceY = endY - startY; // negative = upward
   const duration = 1800 + Math.random() * 400;
 
   const animation = fw.animate(
@@ -936,39 +937,14 @@ function createFirework() {
 
   animation.onfinish = () => {
     clearInterval(trailInterval);
-
-    // ✅ Compute exact end of the rocket relative to bottom of window
     const rect = fw.getBoundingClientRect();
     const endX = rect.left + rect.width / 2;
-    const endY = rect.bottom; // use bottom instead of top
+    const endY = rect.top + rect.height / 2; // top-based coordinate
     fw.remove();
 
     createExplosion(endX, endY, scale);
   };
 }
-
-function createExplosion(x, y, scale) {
-  const colors = ["#ffd700", "#ff69b4", "#00ffff", "#ffffff", "#ffa500", "#adff2f", "#87cefa", "#ffb6c1"];
-  const sparks = 60 + Math.random() * 40;
-  const spread = 200 * scale;
-  const duration = 2000 + Math.random() * 800;
-
-  for (let i = 0; i < sparks; i++) {
-    const s = document.createElement("div");
-    s.className = "explosion";
-    s.style.left = `${x}px`;
-    s.style.top = `${y}px`;
-    s.style.background = colors[Math.floor(Math.random() * colors.length)];
-    s.style.width = s.style.height = `${3 + Math.random() * 3}px`;
-    s.style.setProperty("--x", `${(Math.random() - 0.5) * spread}px`);
-    s.style.setProperty("--y", `${(Math.random() - 0.5) * spread}px`);
-    s.style.animationDuration = `${duration}ms`;
-    document.body.appendChild(s);
-    setTimeout(() => s.remove(), duration);
-  }
-}
-
-setInterval(createFirework, 3000);
 
 /* === Firebase Setup === */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
