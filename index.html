@@ -1035,33 +1035,47 @@ function createHeartExplosion(x, y) {
     setTimeout(() => s.remove(), duration);
   }
 }
-function createHelloKittyExplosion(x, y) {
-  const colorMain = "#ffd6ec"; // pastel pink-white glow
-  const colorBow = "#ff4d6d";  // bright bow
-  const duration = 2800;
 
-  // 🎀 Kitty-shaped outline (refined)
+function createHelloKittyExplosion(x, y) {
+  const colorMain = "#ffe4f0"; // soft pink-white for face
+  const colorBow = "#ff4d6d";  // vivid bow color
+  const duration = 2800;
   const kittyPoints = [];
 
-  // Head outline — smoother ellipse (more points)
-  for (let i = 0; i < 60; i++) {
-    const angle = (i / 60) * 2 * Math.PI;
-    const radiusX = 18;
-    const radiusY = 15;
+  // 🐱 Rounded face shape (more cheek definition)
+  for (let i = 0; i < 80; i++) {
+    const angle = (i / 80) * 2 * Math.PI;
+    const radiusX = 20 + Math.sin(angle * 2) * 2; // subtle cheek shaping
+    const radiusY = 16;
     kittyPoints.push({ x: Math.cos(angle) * radiusX, y: Math.sin(angle) * radiusY });
   }
 
-  // Ears
-  kittyPoints.push({ x: -14, y: -16 }, { x: -10, y: -10 }, { x: -6, y: -16 });
-  kittyPoints.push({ x: 14, y: -16 }, { x: 10, y: -10 }, { x: 6, y: -16 });
-
-  // Bow on right ear (cluster)
+  // 👂 Ears (sharper triangle clusters)
   kittyPoints.push(
-    { x: 10, y: -14, bow: true },
-    { x: 12, y: -16, bow: true },
-    { x: 14, y: -14, bow: true },
-    { x: 12, y: -12, bow: true }
+    { x: -16, y: -18 }, { x: -10, y: -10 }, { x: -5, y: -18 }, // left ear
+    { x: 16, y: -18 }, { x: 10, y: -10 }, { x: 5, y: -18 }     // right ear
   );
+
+  // 🎀 Bow (oval lobes + center knot)
+  kittyPoints.push(
+    { x: 11, y: -14, bow: true },
+    { x: 13, y: -15, bow: true },
+    { x: 15, y: -14, bow: true },
+    { x: 13, y: -12, bow: true },
+    { x: 13, y: -13, bow: true }, // center
+    { x: 11, y: -13, bow: true },
+    { x: 15, y: -13, bow: true }
+  );
+
+  // 💫 Sparkle dots inside face (optional detail shimmer)
+  for (let i = 0; i < 10; i++) {
+    kittyPoints.push({
+      x: (Math.random() - 0.5) * 18,
+      y: (Math.random() - 0.5) * 14,
+      bow: false,
+      sparkle: true
+    });
+  }
 
   kittyPoints.forEach((p) => {
     const s = document.createElement("div");
@@ -1069,7 +1083,7 @@ function createHelloKittyExplosion(x, y) {
     s.style.left = `${x}px`;
     s.style.top = `${y}px`;
     s.style.background = p.bow ? colorBow : colorMain;
-    s.style.width = s.style.height = `${4 + Math.random() * 2}px`;
+    s.style.width = s.style.height = `${p.sparkle ? 2 + Math.random() * 2 : 4 + Math.random() * 2}px`;
     s.style.setProperty("--x", `${p.x * 8}px`);
     s.style.setProperty("--y", `${p.y * 8}px`);
     s.style.animationDuration = `${duration}ms`;
