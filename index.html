@@ -835,7 +835,12 @@ body.placing-star {
 .explosion[style*="fff0f6"][style*="width: 4.5px"] {
   filter: drop-shadow(0 0 14px rgba(255, 240, 246, 0.9));
 }
-
+/* ✨ Ear Glow Boost */
+.explosion[style*="background: rgb(255, 230, 240)"] {
+  filter: drop-shadow(0 0 18px rgba(255, 240, 246, 0.95))
+          drop-shadow(0 0 28px rgba(255, 182, 193, 0.6));
+  transform: scale(1.15);
+}
 
 </style>
 </head>
@@ -1074,29 +1079,30 @@ function createHelloKittyExplosion(x, y) {
   const colorWhisker = "#ffc0cb";
   const colorEye = "#222";
   const colorNose = "#ffb3b3";
-  const duration = 4400;
+  const colorEar = "#ffe6f0";
+  const duration = 4600;
   const kittyPoints = [];
 
-  // 🐱 Head shape (flatter top + fuller cheeks)
+  // 🐱 Head shape – flat top, wide cheeks
   for (let i = 0; i < 100; i++) {
     const angle = (i / 100) * 2 * Math.PI;
     const radiusX = 22;
-    let radiusY;
-    if (angle < Math.PI) radiusY = 13 + Math.sin(angle * 2) * 1.2;
-    else radiusY = 18 + Math.sin(angle * 2) * 2.5;
-
+    let radiusY = angle < Math.PI ? 13 + Math.sin(angle * 2) * 1.2 : 18 + Math.sin(angle * 2) * 2.5;
     kittyPoints.push({ x: Math.cos(angle) * radiusX, y: Math.sin(angle) * radiusY });
   }
 
-  // 👂 Enhanced Ears — taller and sharper
-  kittyPoints.push(
-    { x: -15, y: -19, ear: true },
-    { x: -9, y: -8, ear: true },
-    { x: -3, y: -19, ear: true },
-    { x: 15, y: -19, ear: true },
-    { x: 9, y: -8, ear: true },
-    { x: 3, y: -19, ear: true }
-  );
+  // 👂 Enhanced Ears — taller, pointier, and glowing
+  const earShape = [
+    // Left ear triangle
+    { x: -13, y: -21, ear: true },
+    { x: -9, y: -10, ear: true },
+    { x: -5, y: -21, ear: true },
+    // Right ear triangle
+    { x: 13, y: -21, ear: true },
+    { x: 9, y: -10, ear: true },
+    { x: 5, y: -21, ear: true }
+  ];
+  kittyPoints.push(...earShape);
 
   // 🎀 Bow
   kittyPoints.push(
@@ -1123,13 +1129,13 @@ function createHelloKittyExplosion(x, y) {
   whiskerY.forEach((wy) => {
     for (let i = 1; i <= 3; i++) {
       const curve = Math.sin(i / 2) * 1.5;
-      kittyPoints.push({ x: -4 - i * 2.5, y: wy + curve, whisker: true }); // left (curved)
-      kittyPoints.push({ x: 4 + i * 2.5, y: wy + curve, whisker: true });  // right (curved)
+      kittyPoints.push({ x: -4 - i * 2.5, y: wy + curve, whisker: true });
+      kittyPoints.push({ x: 4 + i * 2.5, y: wy + curve, whisker: true });
     }
   });
 
   // ✨ Face shimmer
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 15; i++) {
     kittyPoints.push({
       x: (Math.random() - 0.5) * 16,
       y: (Math.random() - 0.5) * 14,
@@ -1144,24 +1150,31 @@ function createHelloKittyExplosion(x, y) {
     s.style.left = `${x}px`;
     s.style.top = `${y}px`;
 
+    // 🎨 Assign colors
     if (p.bow) s.style.background = colorBow;
     else if (p.whisker) s.style.background = colorWhisker;
     else if (p.eye) s.style.background = colorEye;
     else if (p.nose) s.style.background = colorNose;
+    else if (p.ear) s.style.background = colorEar;
     else s.style.background = colorFace;
 
-    // Size variations
+    // 📏 Adjust sizes for realism
     if (p.eye) s.style.width = s.style.height = "3px";
     else if (p.nose) s.style.width = s.style.height = "2.5px";
-    else if (p.ear) s.style.width = s.style.height = "4.5px";
+    else if (p.ear) s.style.width = s.style.height = "5px";
     else if (p.whisker) s.style.width = s.style.height = "2px";
     else s.style.width = s.style.height = "3.5px";
 
+    // 🌀 Animation
     s.style.setProperty("--x", `${p.x * 6}px`);
     s.style.setProperty("--y", `${p.y * 6}px`);
     s.style.animationDuration = `${duration}ms`;
 
-    if (p.ear) s.style.filter = "drop-shadow(0 0 10px #fff0f6)";
+    if (p.ear) {
+      s.style.filter = "drop-shadow(0 0 18px #fff0f6) brightness(1.5)";
+      s.style.opacity = 1;
+    }
+
     if (p.whisker) s.style.opacity = 0.8;
     if (p.eye || p.nose) s.style.zIndex = 9999;
 
