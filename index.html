@@ -804,6 +804,17 @@ body.placing-star {
 .explosion[style*="ff4d6d"] {
   filter: drop-shadow(0 0 10px #ff4d6d) brightness(1.5);
 }
+/* 🎀 Hello Kitty bow glow enhancement */
+.explosion[style*="ff4d6d"] {
+  filter: drop-shadow(0 0 15px #ff4d6d) brightness(1.6);
+  animation: kittyTwinkle 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes kittyTwinkle {
+  0% { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 8px #ff4d6d) brightness(1.2); }
+  50% { transform: scale(1.25); opacity: 0.8; filter: drop-shadow(0 0 18px #ff7fa2) brightness(1.6); }
+  100% { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 8px #ff4d6d) brightness(1.2); }
+}
 
 </style>
 </head>
@@ -1037,42 +1048,51 @@ function createHeartExplosion(x, y) {
 }
 
 function createHelloKittyExplosion(x, y) {
-  const colorMain = "#ffe4f0"; // soft pink-white for face
-  const colorBow = "#ff4d6d";  // vivid bow color
-  const duration = 2800;
+  const colorFace = "#fff0f6"; // pale pink-white face glow
+  const colorBow = "#ff4d6d";  // vivid pink bow
+  const duration = 3000;
   const kittyPoints = [];
 
-  // 🐱 Rounded face shape (more cheek definition)
-  for (let i = 0; i < 80; i++) {
-    const angle = (i / 80) * 2 * Math.PI;
-    const radiusX = 20 + Math.sin(angle * 2) * 2; // subtle cheek shaping
-    const radiusY = 16;
-    kittyPoints.push({ x: Math.cos(angle) * radiusX, y: Math.sin(angle) * radiusY });
+  // 🩷 Head shape (elliptical cheeks + subtle chin curve)
+  for (let i = 0; i < 100; i++) {
+    const angle = (i / 100) * 2 * Math.PI;
+    const radiusX = 20;
+    const radiusY = 17 + Math.sin(angle * 2) * 1.5; // subtle cheeks
+    kittyPoints.push({ 
+      x: Math.cos(angle) * radiusX, 
+      y: Math.sin(angle) * radiusY 
+    });
   }
 
-  // 👂 Ears (sharper triangle clusters)
+  // 👂 Ears (defined triangles on top corners)
   kittyPoints.push(
-    { x: -16, y: -18 }, { x: -10, y: -10 }, { x: -5, y: -18 }, // left ear
-    { x: 16, y: -18 }, { x: 10, y: -10 }, { x: 5, y: -18 }     // right ear
+    { x: -15, y: -17 }, { x: -10, y: -10 }, { x: -5, y: -17 }, // left ear
+    { x: 15, y: -17 }, { x: 10, y: -10 }, { x: 5, y: -17 }      // right ear
   );
 
-  // 🎀 Bow (oval lobes + center knot)
+  // 🎀 Bow (3D feel: two loops + center knot)
   kittyPoints.push(
-    { x: 11, y: -14, bow: true },
-    { x: 13, y: -15, bow: true },
-    { x: 15, y: -14, bow: true },
-    { x: 13, y: -12, bow: true },
-    { x: 13, y: -13, bow: true }, // center
-    { x: 11, y: -13, bow: true },
-    { x: 15, y: -13, bow: true }
+    // left loop
+    { x: 9, y: -13, bow: true },
+    { x: 11, y: -15, bow: true },
+    { x: 13, y: -13, bow: true },
+    { x: 11, y: -11, bow: true },
+    // right loop
+    { x: 15, y: -13, bow: true },
+    { x: 17, y: -15, bow: true },
+    { x: 19, y: -13, bow: true },
+    { x: 17, y: -11, bow: true },
+    // center knot
+    { x: 13, y: -13, bow: true },
+    { x: 15, y: -13, bow: true },
+    { x: 14, y: -13, bow: true }
   );
 
-  // 💫 Sparkle dots inside face (optional detail shimmer)
-  for (let i = 0; i < 10; i++) {
+  // ✨ Gentle facial sparkle shimmer
+  for (let i = 0; i < 12; i++) {
     kittyPoints.push({
-      x: (Math.random() - 0.5) * 18,
+      x: (Math.random() - 0.5) * 16,
       y: (Math.random() - 0.5) * 14,
-      bow: false,
       sparkle: true
     });
   }
@@ -1082,7 +1102,7 @@ function createHelloKittyExplosion(x, y) {
     s.className = "explosion";
     s.style.left = `${x}px`;
     s.style.top = `${y}px`;
-    s.style.background = p.bow ? colorBow : colorMain;
+    s.style.background = p.bow ? colorBow : colorFace;
     s.style.width = s.style.height = `${p.sparkle ? 2 + Math.random() * 2 : 4 + Math.random() * 2}px`;
     s.style.setProperty("--x", `${p.x * 8}px`);
     s.style.setProperty("--y", `${p.y * 8}px`);
