@@ -819,6 +819,13 @@ body.placing-star {
 .explosion[style*="ffc0cb"] {
   filter: drop-shadow(0 0 10px #ffb6c1) brightness(1.3);
 }
+/* 🐱 Eyes + Nose subtle glow */
+.explosion[style*="background: rgb(34, 34, 34)"] {
+  filter: drop-shadow(0 0 3px rgba(0,0,0,0.4));
+}
+.explosion[style*="ffb3b3"] {
+  filter: drop-shadow(0 0 6px #ffb3b3) brightness(1.3);
+}
 
 </style>
 </head>
@@ -1054,53 +1061,77 @@ function createHeartExplosion(x, y) {
 function createHelloKittyExplosion(x, y) {
   const colorFace = "#fff0f6";
   const colorBow = "#ff4d6d";
-  const duration = 4000;
+  const colorWhisker = "#ffc0cb";
+  const colorEye = "#222";
+  const colorNose = "#ffb3b3";
+  const duration = 4200;
   const kittyPoints = [];
 
-  // 🐱 Head shape
+  // 🐱 Head shape – oval with flatter top and rounder cheeks
   for (let i = 0; i < 100; i++) {
     const angle = (i / 100) * 2 * Math.PI;
-    const radiusX = 20;
-    const radiusY = 17 + Math.sin(angle * 2) * 1.5;
+    const radiusX = 22;
+    let radiusY;
+
+    if (angle < Math.PI) {
+      // top half flatter
+      radiusY = 13 + Math.sin(angle * 2) * 1.5;
+    } else {
+      // bottom half more rounded for cheeks
+      radiusY = 17 + Math.sin(angle * 2) * 2.5;
+    }
+
     kittyPoints.push({
       x: Math.cos(angle) * radiusX,
       y: Math.sin(angle) * radiusY
     });
   }
 
-  // 👂 Ears
+  // 👂 Ears (triangles)
   kittyPoints.push(
     { x: -15, y: -17 }, { x: -10, y: -10 }, { x: -5, y: -17 },
     { x: 15, y: -17 }, { x: 10, y: -10 }, { x: 5, y: -17 }
   );
 
-  // 🎀 Bow
+  // 🎀 Bow (right ear side)
   kittyPoints.push(
-    { x: 9, y: -13, bow: true }, { x: 11, y: -15, bow: true },
-    { x: 13, y: -13, bow: true }, { x: 11, y: -11, bow: true },
-    { x: 15, y: -13, bow: true }, { x: 17, y: -15, bow: true },
-    { x: 19, y: -13, bow: true }, { x: 17, y: -11, bow: true },
-    { x: 13, y: -13, bow: true }, { x: 15, y: -13, bow: true },
+    { x: 9, y: -13, bow: true },
+    { x: 11, y: -15, bow: true },
+    { x: 13, y: -13, bow: true },
+    { x: 11, y: -11, bow: true },
+    { x: 15, y: -13, bow: true },
+    { x: 17, y: -15, bow: true },
+    { x: 19, y: -13, bow: true },
+    { x: 17, y: -11, bow: true },
+    { x: 13, y: -13, bow: true },
+    { x: 15, y: -13, bow: true },
     { x: 14, y: -13, bow: true }
   );
 
+  // 👁 Eyes + 👃 Nose
+  kittyPoints.push(
+    { x: -5, y: 0, eye: true },
+    { x: 5, y: 0, eye: true },
+    { x: 0, y: 3, nose: true }
+  );
+
+  // 😺 Whiskers (3 each side)
+  const whiskerY = [-4, -1, 2];
+  whiskerY.forEach((wy) => {
+    for (let i = 1; i <= 3; i++) {
+      kittyPoints.push({ x: -4 - i * 2.5, y: wy, whisker: true }); // left
+      kittyPoints.push({ x: 4 + i * 2.5, y: wy, whisker: true });  // right
+    }
+  });
+
   // ✨ Face shimmer
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 10; i++) {
     kittyPoints.push({
       x: (Math.random() - 0.5) * 16,
       y: (Math.random() - 0.5) * 14,
       sparkle: true
     });
   }
-
-  // 😺 Whiskers (3 per side)
-  const whiskerY = [-4, -1, 2];
-  whiskerY.forEach((wy) => {
-    for (let i = 1; i <= 3; i++) {
-      kittyPoints.push({ x: -4 - i * 2.5, y: wy, whisker: true }); // left side
-      kittyPoints.push({ x: 4 + i * 2.5, y: wy, whisker: true });  // right side
-    }
-  });
 
   // 🌸 Create each particle
   kittyPoints.forEach((p) => {
@@ -1109,22 +1140,19 @@ function createHelloKittyExplosion(x, y) {
     s.style.left = `${x}px`;
     s.style.top = `${y}px`;
 
-    if (p.whisker) {
-      s.style.background = "#ffc0cb"; // pinkish whiskers
-    } else {
-      s.style.background = p.bow ? colorBow : colorFace;
-    }
+    if (p.bow) s.style.background = colorBow;
+    else if (p.whisker) s.style.background = colorWhisker;
+    else if (p.eye) s.style.background = colorEye;
+    else if (p.nose) s.style.background = colorNose;
+    else s.style.background = colorFace;
 
-    s.style.width = s.style.height = `${p.sparkle ? 2 : 3}px`;
+    s.style.width = s.style.height = `${p.eye ? 3 : p.nose ? 2.5 : p.sparkle ? 2 : 3.5}px`;
     s.style.setProperty("--x", `${p.x * 6}px`);
     s.style.setProperty("--y", `${p.y * 6}px`);
     s.style.animationDuration = `${duration}ms`;
 
-    // Whiskers spread slightly wider and faster
-    if (p.whisker) {
-      s.style.animationDuration = `${duration * 0.8}ms`;
-      s.style.opacity = 0.8;
-    }
+    if (p.whisker) s.style.opacity = 0.85;
+    if (p.eye || p.nose) s.style.zIndex = 9999;
 
     document.body.appendChild(s);
     setTimeout(() => s.remove(), duration);
