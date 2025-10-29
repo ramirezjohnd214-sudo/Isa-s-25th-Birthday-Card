@@ -773,73 +773,56 @@ body.placing-star {
   100% { opacity: 0; transform: scale(0.6); }
 }
 
-  /* 💖 Hello Kitty sparkle effect */
-  .explosion[style*="ffb6c1"] {
-    filter: drop-shadow(0 0 10px #ffb6c1) brightness(1.4);
-  }
-  .explosion[style*="ff4d6d"] {
-    filter: drop-shadow(0 0 8px #ff4d6d) brightness(1.3);
-  }
+/* 💖 Hello Kitty Sparkle + Glow Effects */
 
-  /* 🎀 Hello Kitty bow twinkle animation */
+/* 🌸 Bow Glow & Twinkle */
 @keyframes kittyTwinkle {
   0%, 100% {
-    filter: drop-shadow(0 0 8px #ff4d6d) brightness(1.2);
     transform: scale(1);
+    opacity: 1;
+    filter: drop-shadow(0 0 8px #ff4d6d) brightness(1.2);
   }
   50% {
-    filter: drop-shadow(0 0 16px #ff7fa2) brightness(1.6);
-    transform: scale(1.2);
+    transform: scale(1.25);
+    opacity: 0.85;
+    filter: drop-shadow(0 0 18px #ff7fa2) brightness(1.6);
   }
 }
 
-/* Apply twinkle to Hello Kitty bow sparkles */
 .explosion[style*="ff4d6d"] {
-  animation: sparkleFade 2.4s ease-out forwards, kittyTwinkle 1.2s ease-in-out infinite;
-}
-/* 🐱 Boost Hello Kitty visibility */
-.explosion[style*="ffd6ec"] {
-  filter: drop-shadow(0 0 15px #ffd6ec) brightness(1.6);
-}
-.explosion[style*="ff4d6d"] {
-  filter: drop-shadow(0 0 10px #ff4d6d) brightness(1.5);
-}
-/* 🎀 Hello Kitty bow glow enhancement */
-.explosion[style*="ff4d6d"] {
+  /* Bow color */
   filter: drop-shadow(0 0 15px #ff4d6d) brightness(1.6);
-  animation: kittyTwinkle 1.8s ease-in-out infinite alternate;
+  animation: sparkleFade 2.4s ease-out forwards,
+             kittyTwinkle 1.8s ease-in-out infinite alternate;
 }
 
-@keyframes kittyTwinkle {
-  0% { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 8px #ff4d6d) brightness(1.2); }
-  50% { transform: scale(1.25); opacity: 0.8; filter: drop-shadow(0 0 18px #ff7fa2) brightness(1.6); }
-  100% { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 8px #ff4d6d) brightness(1.2); }
-}
-/* 🐱 Soft pink glow for Hello Kitty's whiskers */
+/* 🐱 Whiskers – soft pink shimmer */
 .explosion[style*="ffc0cb"] {
   filter: drop-shadow(0 0 10px #ffb6c1) brightness(1.3);
 }
-/* 🐱 Eyes + Nose subtle glow */
+
+/* 🖤 Eyes – subtle shadow */
 .explosion[style*="background: rgb(34, 34, 34)"] {
-  filter: drop-shadow(0 0 3px rgba(0,0,0,0.4));
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.4));
 }
+
+/* 💕 Nose – light pink glow */
 .explosion[style*="ffb3b3"] {
   filter: drop-shadow(0 0 6px #ffb3b3) brightness(1.3);
 }
-/* 🐱 Whisker glow */
-.explosion[style*="ffc0cb"] {
-  filter: drop-shadow(0 0 10px #ffb6c1) brightness(1.3);
+
+/* 🐱 Face shimmer */
+.explosion[style*="fff0f6"] {
+  filter: drop-shadow(0 0 12px rgba(255, 240, 246, 0.8));
 }
 
-/* 👂 Ear highlight */
-.explosion[style*="fff0f6"][style*="width: 4.5px"] {
-  filter: drop-shadow(0 0 14px rgba(255, 240, 246, 0.9));
-}
-/* ✨ Ear Glow Boost */
-.explosion[style*="background: rgb(255, 230, 240)"] {
+/* 👂 Ear highlight & depth */
+.explosion[style*="background: rgb(255, 230, 240)"],
+.explosion[style*="width: 5px"][style*="fff0f6"] {
   filter: drop-shadow(0 0 18px rgba(255, 240, 246, 0.95))
           drop-shadow(0 0 28px rgba(255, 182, 193, 0.6));
   transform: scale(1.15);
+  opacity: 1;
 }
 
 </style>
