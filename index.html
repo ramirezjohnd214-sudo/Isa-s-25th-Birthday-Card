@@ -1341,6 +1341,143 @@ logoutBtn.onclick = async () => {
   loginBtn.style.display = "inline-block";
   alert("Signed out.");
 };
+
 </script>
+
+<!-- 🎵 Background Music with Auto-Fade, Beat Pulse & Magical Button -->
+<button id="playMusic" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  padding: 10px 16px;
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  animation: fadeInMusic 2.5s ease-in forwards;
+  animation-delay: 6s;
+">
+🎵 Play Music
+</button>
+
+<audio id="bgMusic" loop preload="auto">
+  <source src="travel-in-light-345685.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const music = document.getElementById("bgMusic");
+const playButton = document.getElementById("playMusic");
+
+// 🌅 Auto-fade in when page loads
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    const fadeDuration = 4000;
+    let volume = 0;
+    music.volume = 0;
+    const fadeIn = setInterval(() => {
+      if (volume < 1.0) {
+        volume += 0.02;
+        music.volume = Math.min(volume, 1.0);
+      } else clearInterval(fadeIn);
+    }, fadeDuration / 50);
+
+    music.play().catch(() => {
+      console.log("Autoplay prevented. User interaction required.");
+    });
+  }, 2000);
+});
+
+// Enable button after delay
+setTimeout(() => {
+  playButton.style.pointerEvents = "auto";
+}, 6000);
+
+// 🎧 Smooth fade-in/out toggle
+playButton.addEventListener("click", async () => {
+  if (music.paused) {
+    playButton.textContent = "⏸ Pause Music";
+    music.volume = 0;
+    await music.play();
+    let volume = 0;
+    const fadeIn = setInterval(() => {
+      if (volume < 1.0) {
+        volume += 0.05;
+        music.volume = Math.min(volume, 1.0);
+      } else clearInterval(fadeIn);
+    }, 100);
+  } else {
+    let volume = music.volume;
+    const fadeOut = setInterval(() => {
+      if (volume > 0.05) {
+        volume -= 0.05;
+        music.volume = Math.max(volume, 0);
+      } else {
+        clearInterval(fadeOut);
+        music.pause();
+        playButton.textContent = "🎵 Play Music";
+      }
+    }, 100);
+  }
+});
+</script>
+
+<style>
+/* 🌈 Gentle glow breathing (background pulse) */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 8px rgba(255, 255, 255, 0.3),
+      0 0 15px rgba(255, 182, 193, 0.4),
+      0 0 25px rgba(173, 216, 230, 0.2);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(255, 255, 255, 0.7),
+      0 0 40px rgba(255, 182, 193, 0.8),
+      0 0 60px rgba(173, 216, 230, 0.6);
+    transform: scale(1.08);
+  }
+}
+
+/* 🎶 Beat Pulse (syncs with music tempo ~92 BPM) */
+@keyframes beatPulse {
+  0%, 100% {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+  50% {
+    background: rgba(255, 192, 203, 0.25);
+    border-color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+/* ✨ Fade-in animation */
+@keyframes fadeInMusic {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+#playMusic {
+  animation:
+    fadeInMusic 2.5s ease-in forwards 6s,
+    glowPulse 3s ease-in-out infinite,
+    beatPulse 1.3s ease-in-out infinite;
+}
+
+#playMusic:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 1);
+  transform: scale(1.1);
+}
+</style>
+
 </body>
 </html>
