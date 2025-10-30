@@ -1222,7 +1222,7 @@ nameInput.addEventListener("input", () => {
   nameInput.value = nameInput.value.replace(/[^a-zA-Z\s]/g, "");
 });
 
-/* === Star Placement === */
+/* === Star Placement (Responsive Fix) === */
 let currentX = 0, currentY = 0, admin = false, isPlacing = false;
 
 addBtn.onclick = () => {
@@ -1245,8 +1245,13 @@ document.addEventListener("click", e => {
   notice.classList.remove("show");
   notice.style.display = "none";
 
-  currentX = e.clientX;
-  currentY = e.clientY;
+  const sky = document.getElementById("sky"); // container or body
+  const rect = sky.getBoundingClientRect();
+
+  // store positions as percentages so they stay consistent
+  currentX = ((e.clientX - rect.left) / rect.width) * 100;
+  currentY = ((e.clientY - rect.top) / rect.height) * 100;
+
   addModal.showModal();
 });
 
@@ -1259,21 +1264,30 @@ addForm.onsubmit = async e => {
   const message = msgInput.value.trim();
   if (!name || !message) return alert("Please enter your name and message 🌟");
 
+  // save percent values instead of raw pixels
   await addDoc(collection(db, "messages"), { name, message, x: currentX, y: currentY });
   addModal.close();
   renderStars();
 };
 
-/* === Render Stars === */
+/* === Render Stars (Adjusts for screen size) === */
 async function renderStars() {
   layer.innerHTML = "";
   const snapshot = await getDocs(collection(db, "messages"));
+  const sky = document.getElementById("sky");
+  const rect = sky.getBoundingClientRect();
+
   snapshot.forEach(docSnap => {
     const data = docSnap.data();
     const el = document.createElement("div");
     el.className = "mstar";
-    el.style.left = `${data.x}px`;
-    el.style.top = `${data.y}px`;
+
+    // convert percentage back to pixel values
+    const x = (data.x / 100) * rect.width;
+    const y = (data.y / 100) * rect.height;
+
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
 
     const tip = document.createElement("div");
     tip.className = "tooltip";
@@ -1311,6 +1325,9 @@ function openView(id, data) {
   document.getElementById("closeView").onclick = () => viewModal.close();
   viewModal.showModal();
 }
+
+/* 🔄 Make stars stay aligned on resize */
+window.addEventListener("resize", renderStars);
 
 renderStars();
 
