@@ -1222,9 +1222,8 @@ nameInput.addEventListener("input", () => {
   nameInput.value = nameInput.value.replace(/[^a-zA-Z\s]/g, "");
 });
 
-/* === Star Placement (Responsive + Background-Aware) === */
-let currentXPercent = 0, currentYPercent = 0, admin = false, isPlacing = false;
-const sky = document.getElementById("sky"); // Make sure your sky container has this ID
+/* === Star Placement === */
+let currentX = 0, currentY = 0, admin = false, isPlacing = false;
 
 addBtn.onclick = () => {
   isPlacing = true;
@@ -1235,7 +1234,7 @@ addBtn.onclick = () => {
   notice.classList.add("show");
 };
 
-sky.addEventListener("click", e => {
+document.addEventListener("click", e => {
   if (!isPlacing) return;
   if (e.target.closest("button, dialog, .mstar, .tooltip")) return;
 
@@ -1246,14 +1245,8 @@ sky.addEventListener("click", e => {
   notice.classList.remove("show");
   notice.style.display = "none";
 
-  // 🌠 Calculate position relative to sky container
-  const rect = sky.getBoundingClientRect();
-  const xPercent = (e.clientX - rect.left) / rect.width;
-  const yPercent = (e.clientY - rect.top) / rect.height;
-
-  currentXPercent = Math.min(Math.max(xPercent, 0), 1);
-  currentYPercent = Math.min(Math.max(yPercent, 0), 1);
-
+  currentX = e.clientX;
+  currentY = e.clientY;
   addModal.showModal();
 });
 
@@ -1266,34 +1259,21 @@ addForm.onsubmit = async e => {
   const message = msgInput.value.trim();
   if (!name || !message) return alert("Please enter your name and message 🌟");
 
-  await addDoc(collection(db, "messages"), {
-    name,
-    message,
-    xPercent: currentXPercent,
-    yPercent: currentYPercent
-  });
-
+  await addDoc(collection(db, "messages"), { name, message, x: currentX, y: currentY });
   addModal.close();
   renderStars();
 };
 
-/* === Render Stars (Aligned with Background) === */
+/* === Render Stars === */
 async function renderStars() {
   layer.innerHTML = "";
   const snapshot = await getDocs(collection(db, "messages"));
-  const rect = sky.getBoundingClientRect(); // always use current dimensions
-
   snapshot.forEach(docSnap => {
     const data = docSnap.data();
     const el = document.createElement("div");
     el.className = "mstar";
-
-    // ⭐ Convert percentages to pixel coordinates within sky
-    const x = data.xPercent * rect.width;
-    const y = data.yPercent * rect.height;
-
-    el.style.left = `${x}px`;
-    el.style.top = `${y}px`;
+    el.style.left = `${data.x}px`;
+    el.style.top = `${data.y}px`;
 
     const tip = document.createElement("div");
     tip.className = "tooltip";
@@ -1331,9 +1311,6 @@ function openView(id, data) {
   document.getElementById("closeView").onclick = () => viewModal.close();
   viewModal.showModal();
 }
-
-/* 🔄 Re-render stars when window resizes or background changes */
-window.addEventListener("resize", renderStars);
 
 renderStars();
 
