@@ -1222,8 +1222,8 @@ nameInput.addEventListener("input", () => {
   nameInput.value = nameInput.value.replace(/[^a-zA-Z\s]/g, "");
 });
 
-/* === Star Placement === */
-let currentX = 0, currentY = 0, admin = false, isPlacing = false;
+/* === Star Placement (Responsive) === */
+let currentXPercent = 0, currentYPercent = 0, admin = false, isPlacing = false;
 
 addBtn.onclick = () => {
   isPlacing = true;
@@ -1245,8 +1245,10 @@ document.addEventListener("click", e => {
   notice.classList.remove("show");
   notice.style.display = "none";
 
-  currentX = e.clientX;
-  currentY = e.clientY;
+  // 🌟 Store as relative percentages instead of fixed pixels
+  currentXPercent = e.clientX / window.innerWidth;
+  currentYPercent = e.clientY / window.innerHeight;
+
   addModal.showModal();
 });
 
@@ -1259,12 +1261,19 @@ addForm.onsubmit = async e => {
   const message = msgInput.value.trim();
   if (!name || !message) return alert("Please enter your name and message 🌟");
 
-  await addDoc(collection(db, "messages"), { name, message, x: currentX, y: currentY });
+  // Save percentage values instead of pixels
+  await addDoc(collection(db, "messages"), {
+    name,
+    message,
+    xPercent: currentXPercent,
+    yPercent: currentYPercent
+  });
+
   addModal.close();
   renderStars();
 };
 
-/* === Render Stars === */
+/* === Render Stars (Responsive Positions) === */
 async function renderStars() {
   layer.innerHTML = "";
   const snapshot = await getDocs(collection(db, "messages"));
@@ -1272,8 +1281,12 @@ async function renderStars() {
     const data = docSnap.data();
     const el = document.createElement("div");
     el.className = "mstar";
-    el.style.left = `${data.x}px`;
-    el.style.top = `${data.y}px`;
+
+    // 🌠 Convert percentages back to pixel coordinates
+    const x = data.xPercent * window.innerWidth;
+    const y = data.yPercent * window.innerHeight;
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
 
     const tip = document.createElement("div");
     tip.className = "tooltip";
@@ -1312,7 +1325,11 @@ function openView(id, data) {
   viewModal.showModal();
 }
 
+/* 🔄 Re-render stars on window resize */
+window.addEventListener("resize", () => renderStars());
+
 renderStars();
+
 
 /* === Admin Login === */
 loginBtn.onclick = () => adminModal.showModal();
